@@ -4,11 +4,7 @@ import {
   Entity,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-
-export enum AttachableType {
-  USER_AVATAR = 'user_avatar',
-  TOUR_IMAGE = 'tour_image',
-}
+import { AttachableType } from './attachable-type.enum';
 
 @Entity('attachments')
 export class Attachment {

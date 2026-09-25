@@ -7,12 +7,8 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { OAuthProvider } from './oauth-provider.enum';
 import { User } from './user.entity';
-
-export enum OAuthProvider {
-  GOOGLE = 'google',
-  FACEBOOK = 'facebook',
-}
 
 @Entity('user_oauth_accounts')
 @Index(['provider', 'providerUserId'], { unique: true })

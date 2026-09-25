@@ -9,14 +9,7 @@ import {
 } from 'typeorm';
 import { Tour } from '../tours/tour.entity';
 import { User } from '../users/user.entity';
-
-export enum BookingStatus {
-  PENDING = 'pending',
-  APPROVED = 'approved',
-  REJECTED = 'rejected',
-  CANCELLED = 'cancelled',
-  COMPLETED = 'completed',
-}
+import { BookingStatus } from './booking-status.enum';
 
 @Entity('bookings')
 export class Booking {
