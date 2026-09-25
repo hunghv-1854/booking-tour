@@ -1,0 +1,1 @@
+export const FOREIGN_KEY_VIOLATION = '23503';
