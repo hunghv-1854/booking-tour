@@ -6,5 +6,3 @@ export const CATEGORY_SELECT = {
   createdAt: true,
   updatedAt: true,
 } as const;
-
-export const CATEGORIES_MAX_LIMIT = 100;

@@ -5,16 +5,8 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-
-export enum UserRole {
-  USER = 'user',
-  ADMIN = 'admin',
-}
-
-export enum UserStatus {
-  ACTIVE = 'active',
-  LOCKED = 'locked',
-}
+import { UserRole } from './user-role.enum';
+import { UserStatus } from './user-status.enum';
 
 @Entity('users')
 export class User {

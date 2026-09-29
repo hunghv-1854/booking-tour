@@ -1,4 +1,4 @@
-import { UserRole } from '../user.entity';
+import { UserRole } from '../user-role.enum';
 
 export interface CreateUserDto {
   email: string;

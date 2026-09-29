@@ -2,7 +2,8 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { I18nService } from 'nestjs-i18n';
 import { Repository } from 'typeorm';
-import { Paginated } from '../common/pagination.interface';
+import { paginate } from '../common/pagination/paginate.util';
+import { Paginated } from '../common/pagination/pagination.interface';
 import { CreateUserDto } from './dto/create-user.dto';
 import { ListUsersQueryDto } from './dto/list-users-query.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
@@ -76,13 +77,7 @@ export class UsersService {
       qb.andWhere('user.role = :role', { role: query.role });
     }
 
-    const [data, total] = await qb
-      .orderBy('user.id', 'ASC')
-      .skip((query.page - 1) * query.limit)
-      .take(query.limit)
-      .getManyAndCount();
-
-    return { data, meta: { page: query.page, limit: query.limit, total } };
+    return paginate(qb.orderBy('user.id', 'ASC'), query);
   }
 
   async findByIdOrThrow(id: number): Promise<User> {

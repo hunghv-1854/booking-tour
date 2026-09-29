@@ -7,5 +7,6 @@
   "max_length": "{property} must be shorter than or equal to {constraints.0} characters",
   "is_int": "{property} must be an integer",
   "min": "{property} must not be less than {constraints.0}",
-  "max": "{property} must not be greater than {constraints.0}"
+  "max": "{property} must not be greater than {constraints.0}",
+  "is_enum": "{property} must be one of the following values: {constraints.1}"
 }

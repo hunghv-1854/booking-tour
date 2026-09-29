@@ -7,7 +7,8 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { I18nService } from 'nestjs-i18n';
 import { Not, Repository } from 'typeorm';
-import { Paginated } from '../common/pagination.interface';
+import { paginate } from '../common/pagination/paginate.util';
+import { Paginated } from '../common/pagination/pagination.interface';
 import { isForeignKeyViolation } from '../common/postgres-error.util';
 import { CATEGORY_SELECT } from './categories.constants';
 import { Category } from './category.entity';
@@ -34,13 +35,7 @@ export class CategoriesService {
       });
     }
 
-    const [data, total] = await qb
-      .orderBy('category.id', 'ASC')
-      .skip((query.page - 1) * query.limit)
-      .take(query.limit)
-      .getManyAndCount();
-
-    return { data, meta: { page: query.page, limit: query.limit, total } };
+    return paginate(qb.orderBy('category.id', 'ASC'), query);
   }
 
   async findByIdOrThrow(id: number): Promise<Category> {

@@ -4,7 +4,7 @@ import { NestFactory } from '@nestjs/core';
 import * as bcrypt from 'bcrypt';
 import { AppModule } from '../../app.module';
 import { PASSWORD_SALT_ROUNDS } from '../../auth/auth.constants';
-import { UserRole } from '../../users/user.entity';
+import { UserRole } from '../../users/user-role.enum';
 import { UsersService } from '../../users/users.service';
 
 const logger = new Logger('AdminSeed');
