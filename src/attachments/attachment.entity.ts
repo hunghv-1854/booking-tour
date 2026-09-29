@@ -2,11 +2,13 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  Index,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { AttachableType } from './attachable-type.enum';
 
 @Entity('attachments')
+@Index(['attachableType', 'attachableId'])
 export class Attachment {
   @PrimaryGeneratedColumn('uuid')
   id: string;

@@ -4,7 +4,6 @@ import { IsInt, IsOptional, IsString, Max, Min } from 'class-validator';
 import { i18nValidationMessage } from 'nestjs-i18n';
 import { DEFAULT_LIMIT, DEFAULT_PAGE, MAX_LIMIT } from './pagination.constants';
 
-/** Base query for every list endpoint; extend it to add module-specific filters. */
 export class PaginationQueryDto {
   @ApiPropertyOptional({ type: Number, default: DEFAULT_PAGE, minimum: 1 })
   @IsOptional()

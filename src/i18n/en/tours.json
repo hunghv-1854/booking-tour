@@ -1,0 +1,9 @@
+{
+  "not_found": "Tour was not found",
+  "slug_taken": "has already been taken",
+  "category_not_found": "Category was not found",
+  "end_date_before_start_date": "must be on or after startDate",
+  "max_price_below_min_price": "must be greater than or equal to minPrice",
+  "max_slot_below_booked": "must not be less than the {booked} slots already booked",
+  "invalid_day_numbers": "dayNumber must be unique and must not exceed duration"
+}

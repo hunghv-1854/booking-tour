@@ -16,17 +16,22 @@ function translateMessage(message: string, property: string): string {
   return i18n.translate(key, { args: { property, ...args } });
 }
 
+/** e.g. `itineraries.0.title`. */
 function collectErrors(
   errors: ValidationError[],
   acc: Record<string, string[]>,
+  parentPath?: string,
 ): void {
   for (const error of errors) {
+    const path = parentPath
+      ? `${parentPath}.${error.property}`
+      : error.property;
     if (error.children?.length) {
-      collectErrors(error.children, acc);
+      collectErrors(error.children, acc, path);
       continue;
     }
     if (error.constraints) {
-      acc[error.property] = Object.values(error.constraints).map((message) =>
+      acc[path] = Object.values(error.constraints).map((message) =>
         translateMessage(message, error.property),
       );
     }

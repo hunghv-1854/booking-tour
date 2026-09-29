@@ -1,0 +1,9 @@
+{
+  "not_found": "Không tìm thấy tour",
+  "slug_taken": "đã được sử dụng",
+  "category_not_found": "Không tìm thấy category",
+  "end_date_before_start_date": "phải bằng hoặc sau startDate",
+  "max_price_below_min_price": "phải lớn hơn hoặc bằng minPrice",
+  "max_slot_below_booked": "không được nhỏ hơn {booked} slot đã được đặt",
+  "invalid_day_numbers": "dayNumber không được trùng và không được vượt quá duration"
+}
