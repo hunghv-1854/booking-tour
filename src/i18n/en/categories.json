@@ -1,0 +1,5 @@
+{
+  "slug_taken": "has already been taken",
+  "not_found": "Category was not found",
+  "in_use": "Cannot delete a category that still has tours"
+}
