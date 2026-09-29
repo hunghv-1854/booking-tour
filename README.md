@@ -4,6 +4,8 @@
 
 <p align="center">Mock project — Hệ thống đặt tour du lịch, backend API bằng NestJS.</p>
 
+<p align="center"><a href="https://github.com/hunghv-1854/booking-tour/actions/workflows/ci.yml"><img src="https://github.com/hunghv-1854/booking-tour/actions/workflows/ci.yml/badge.svg" alt="CI" /></a></p>
+
 ## Mô tả
 
 Mock project thực hành NestJS: xây dựng backend API cho hệ thống đặt tour du lịch (Guest/User/Admin), tập trung hoàn toàn vào Backend.
@@ -117,3 +119,13 @@ Tạo sẵn 1 tài khoản `role: admin` (email/password lấy từ `SEED_ADMIN_
 $ npm run lint
 $ npm run format
 ```
+
+## CI
+
+GitHub Actions (`.github/workflows/ci.yml`) chạy tự động mỗi khi mở/cập nhật PR vào `main` và khi push lên `main`, gồm 2 job:
+
+- **Lint & format / Build**: `eslint` (không `--fix`, sai format là fail), `tsc --noEmit`, `npm run build`.
+- **Test / E2E testing / Database migration**: dựng Postgres + Redis service, rồi chạy trên DB trống:
+  - `migration:run` → `migration:generate --check` (fail nếu entity bị sửa mà quên tạo migration) → `migration:revert` → `migration:run` lại (đảm bảo `down()` của migration mới nhất chạy được)
+  - `seed:admin` 2 lần (boot toàn bộ app context + kiểm tra idempotent)
+  - `npm test`, `npm run test:e2e`
