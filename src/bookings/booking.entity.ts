@@ -2,11 +2,13 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  Index,
   JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { decimalColumnTransformer } from '../common/transformers/decimal-column.transformer';
 import { Tour } from '../tours/tour.entity';
 import { User } from '../users/user.entity';
 import { BookingStatus } from './booking-status.enum';
@@ -16,6 +18,7 @@ export class Booking {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @Index()
   @Column({ name: 'user_id' })
   userId: number;
 
@@ -39,9 +42,14 @@ export class Booking {
   @Column({ name: 'number_of_children', default: 0 })
   numberOfChildren: number;
 
-  @Column({ name: 'total_price', type: 'decimal' })
-  totalPrice: string;
+  @Column({
+    name: 'total_price',
+    type: 'decimal',
+    transformer: decimalColumnTransformer,
+  })
+  totalPrice: number;
 
+  @Index()
   @Column({
     type: 'enum',
     enum: BookingStatus,

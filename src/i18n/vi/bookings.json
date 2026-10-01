@@ -1,0 +1,10 @@
+{
+  "not_found": "Không tìm thấy booking",
+  "tour_not_found": "Không tìm thấy tour",
+  "start_date_out_of_range": "phải nằm trong khoảng {from} đến {to}",
+  "not_enough_slots": "Tour chỉ còn {available} slot",
+  "not_pending": "Chỉ booking đang chờ duyệt mới được {action}",
+  "action_cancelled": "huỷ",
+  "action_approved": "duyệt",
+  "action_rejected": "từ chối"
+}

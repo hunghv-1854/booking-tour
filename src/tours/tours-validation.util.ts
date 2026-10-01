@@ -1,9 +1,5 @@
-import { UnprocessableEntityException } from '@nestjs/common';
 import { I18nService } from 'nestjs-i18n';
-
-export function fieldError(field: string, message: string) {
-  return new UnprocessableEntityException({ errors: { [field]: [message] } });
-}
+import { fieldError } from '../common/validation/field-error.util';
 
 export function assertDateRange(
   i18n: I18nService,
