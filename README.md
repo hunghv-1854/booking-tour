@@ -34,12 +34,12 @@ Mock project thực hành NestJS: xây dựng backend API cho hệ thống đặ
 **User**
 
 - [x] Đăng nhập / Đăng xuất / Lấy thông tin user hiện tại
-- [ ] Đặt tour
-- [ ] Xem tour đã đặt
+- [x] Đặt tour
+- [x] Xem tour đã đặt
 - [ ] Thêm review cho tour
 - [x] Tìm kiếm tour
 - [x] Quản lý profile (update fullName/phone — upload avatar để dành B4)
-- [ ] Hủy tour khi chưa được admin confirm
+- [x] Hủy tour khi chưa được admin confirm
 - [ ] Đăng nhập qua mạng xã hội
 
 **Admin**
@@ -47,7 +47,7 @@ Mock project thực hành NestJS: xây dựng backend API cho hệ thống đặ
 - [x] Quản lý user
 - [x] Quản lý tour (CRUD) (upload ảnh tour làm cùng PR upload file)
 - [ ] Quản lý review
-- [ ] Quản lý yêu cầu đặt tour (approve/reject)
+- [x] Quản lý yêu cầu đặt tour (approve/reject)
 - [x] Quản lý category (CRUD)
 
 **System**

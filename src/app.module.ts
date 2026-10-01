@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { AcceptLanguageResolver, I18nModule, QueryResolver } from 'nestjs-i18n';
 import { join } from 'path';
 import { AuthModule } from './auth/auth.module';
+import { BookingsModule } from './bookings/bookings.module';
 import { CategoriesModule } from './categories/categories.module';
 import { DatabaseModule } from './database/database.module';
 import { RedisModule } from './redis/redis.module';
@@ -29,6 +30,7 @@ import { ToursModule } from './tours/tours.module';
     AuthModule,
     CategoriesModule,
     ToursModule,
+    BookingsModule,
   ],
 })
 export class AppModule {}
