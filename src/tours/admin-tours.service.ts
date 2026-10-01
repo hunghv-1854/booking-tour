@@ -6,6 +6,7 @@ import { Category } from '../categories/category.entity';
 import { paginate } from '../common/pagination/paginate.util';
 import { Paginated } from '../common/pagination/pagination.interface';
 import { selectColumns } from '../common/query/select-columns.util';
+import { fieldError } from '../common/validation/field-error.util';
 import { CreateTourDto } from './dto/create-tour.dto';
 import { ToursFilterQueryDto } from './dto/tours-filter-query.dto';
 import { TourItineraryDto } from './dto/tour-itinerary.dto';
@@ -18,11 +19,7 @@ import {
   TOUR_UPDATE_CHECK_SELECT,
 } from './tours.constants';
 import { applyToursFilter } from './tours-query.util';
-import {
-  assertDateRange,
-  assertItineraryDays,
-  fieldError,
-} from './tours-validation.util';
+import { assertDateRange, assertItineraryDays } from './tours-validation.util';
 
 @Injectable()
 export class AdminToursService {
