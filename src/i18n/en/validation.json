@@ -7,5 +7,9 @@
   "max_length": "{property} must be shorter than or equal to {constraints.0} characters",
   "is_int": "{property} must be an integer",
   "min": "{property} must not be less than {constraints.0}",
-  "max": "{property} must not be greater than {constraints.0}"
+  "max": "{property} must not be greater than {constraints.0}",
+  "is_enum": "{property} must be one of the following values: {constraints.1}",
+  "is_number": "{property} must be a number",
+  "is_date": "{property} must be a valid date (YYYY-MM-DD)",
+  "is_array": "{property} must be an array"
 }

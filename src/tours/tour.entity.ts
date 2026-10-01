@@ -3,6 +3,7 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  Index,
   JoinColumn,
   ManyToOne,
   OneToMany,
@@ -10,13 +11,16 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { Category } from '../categories/category.entity';
+import { decimalColumnTransformer } from '../common/transformers/decimal-column.transformer';
 import { TourItinerary } from './tour-itinerary.entity';
 
 @Entity('tours')
+@Index(['startDate', 'endDate'])
 export class Tour {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @Index()
   @Column({ name: 'category_id' })
   categoryId: number;
 
@@ -33,12 +37,14 @@ export class Tour {
   @Column({ type: 'text' })
   description: string;
 
-  @Column({ type: 'decimal' })
-  price: string;
+  @Index()
+  @Column({ type: 'decimal', transformer: decimalColumnTransformer })
+  price: number;
 
   @Column()
   duration: number;
 
+  @Index()
   @Column()
   location: string;
 

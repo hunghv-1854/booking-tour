@@ -2,6 +2,7 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  Index,
   JoinColumn,
   ManyToOne,
   OneToOne,
@@ -24,6 +25,7 @@ export class Review {
   @JoinColumn({ name: 'user_id' })
   user: User;
 
+  @Index()
   @Column({ name: 'tour_id' })
   tourId: number;
 

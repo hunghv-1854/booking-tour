@@ -14,10 +14,11 @@ import { ApiOperation, ApiSecurity, ApiTags } from '@nestjs/swagger';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
-import { Paginated } from '../common/pagination.interface';
+import { Paginated } from '../common/pagination/pagination.interface';
 import { ListUsersQueryDto } from './dto/list-users-query.dto';
 import { UpdateUserRoleDto } from './dto/update-user-role.dto';
-import { User, UserRole } from './user.entity';
+import { User } from './user.entity';
+import { UserRole } from './user-role.enum';
 import { UsersService } from './users.service';
 
 @ApiTags('admin/users')

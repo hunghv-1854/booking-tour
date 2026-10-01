@@ -2,13 +2,19 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { I18nService } from 'nestjs-i18n';
 import { Repository } from 'typeorm';
-import { Paginated } from '../common/pagination.interface';
+import { paginate } from '../common/pagination/paginate.util';
+import { selectColumns } from '../common/query/select-columns.util';
+import { Paginated } from '../common/pagination/pagination.interface';
 import { CreateUserDto } from './dto/create-user.dto';
 import { ListUsersQueryDto } from './dto/list-users-query.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { UpdateUserRoleDto } from './dto/update-user-role.dto';
 import { User } from './user.entity';
-import { PUBLIC_USER_SELECT } from './users.constants';
+import {
+  AUTH_USER_SELECT,
+  PUBLIC_USER_SELECT,
+  USER_CREDENTIALS_SELECT,
+} from './users.constants';
 
 @Injectable()
 export class UsersService {
@@ -21,27 +27,14 @@ export class UsersService {
   findByEmail(email: string): Promise<User | null> {
     return this.usersRepository.findOne({
       where: { email: email.toLowerCase() },
-      select: {
-        id: true,
-        email: true,
-        password: true,
-        fullName: true,
-        role: true,
-        status: true,
-      },
+      select: USER_CREDENTIALS_SELECT,
     });
   }
 
   findById(id: number): Promise<User | null> {
     return this.usersRepository.findOne({
       where: { id },
-      select: {
-        id: true,
-        email: true,
-        fullName: true,
-        role: true,
-        status: true,
-      },
+      select: AUTH_USER_SELECT,
     });
   }
 
@@ -62,7 +55,7 @@ export class UsersService {
   async findAll(query: ListUsersQueryDto): Promise<Paginated<User>> {
     const qb = this.usersRepository
       .createQueryBuilder('user')
-      .select(Object.keys(PUBLIC_USER_SELECT).map((field) => `user.${field}`));
+      .select(selectColumns('user', PUBLIC_USER_SELECT));
 
     if (query.keyword) {
       qb.andWhere(
@@ -76,13 +69,7 @@ export class UsersService {
       qb.andWhere('user.role = :role', { role: query.role });
     }
 
-    const [data, total] = await qb
-      .orderBy('user.id', 'ASC')
-      .skip((query.page - 1) * query.limit)
-      .take(query.limit)
-      .getManyAndCount();
-
-    return { data, meta: { page: query.page, limit: query.limit, total } };
+    return paginate(qb.orderBy('user.id', 'ASC'), query);
   }
 
   async findByIdOrThrow(id: number): Promise<User> {

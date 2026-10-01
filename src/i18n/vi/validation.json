@@ -7,5 +7,9 @@
   "max_length": "{property} phải dài tối đa {constraints.0} ký tự",
   "is_int": "{property} phải là số nguyên",
   "min": "{property} không được nhỏ hơn {constraints.0}",
-  "max": "{property} không được lớn hơn {constraints.0}"
+  "max": "{property} không được lớn hơn {constraints.0}",
+  "is_enum": "{property} phải là một trong các giá trị: {constraints.1}",
+  "is_number": "{property} phải là số",
+  "is_date": "{property} phải là ngày hợp lệ (YYYY-MM-DD)",
+  "is_array": "{property} phải là mảng"
 }

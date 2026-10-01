@@ -1,34 +1,18 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
-import { IsEnum, IsInt, IsOptional, IsString, Min } from 'class-validator';
+import { IsEnum, IsOptional } from 'class-validator';
 import { i18nValidationMessage } from 'nestjs-i18n';
-import { UserRole } from '../user.entity';
+import { PaginationQueryDto } from '../../common/pagination/pagination-query.dto';
+import { UserRole } from '../user-role.enum';
 
-export class ListUsersQueryDto {
-  @ApiPropertyOptional({ type: Number, default: 1 })
-  @IsOptional()
-  @Type(() => Number)
-  @IsInt({ message: i18nValidationMessage('validation.is_string') })
-  @Min(1)
-  page = 1;
-
-  @ApiPropertyOptional({ type: Number, default: 10 })
-  @IsOptional()
-  @Type(() => Number)
-  @IsInt({ message: i18nValidationMessage('validation.is_string') })
-  @Min(1)
-  limit = 10;
-
+export class ListUsersQueryDto extends PaginationQueryDto {
   @ApiPropertyOptional({
     type: String,
-    description: 'Search theo email hoặc fullName',
+    description: 'Search by email or fullName',
   })
-  @IsOptional()
-  @IsString({ message: i18nValidationMessage('validation.is_string') })
-  keyword?: string;
+  declare keyword?: string;
 
   @ApiPropertyOptional({ type: String, enum: UserRole })
   @IsOptional()
-  @IsEnum(UserRole, { message: i18nValidationMessage('validation.is_string') })
+  @IsEnum(UserRole, { message: i18nValidationMessage('validation.is_enum') })
   role?: UserRole;
 }
