@@ -21,6 +21,14 @@ services:
     volumes:
       - booking_tour_redisdata:/data
 
+  mailpit:
+    image: axllent/mailpit
+    container_name: booking_tour_mailpit
+    restart: unless-stopped
+    ports:
+      - '1026:1025'
+      - '8026:8025'
+
 volumes:
   booking_tour_pgdata:
   booking_tour_redisdata:
