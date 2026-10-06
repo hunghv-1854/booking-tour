@@ -29,7 +29,7 @@ export class BookingsController {
 
   @ApiOperation({ summary: 'Book a tour' })
   @Post()
-  create(
+  createBooking(
     @CurrentUser() user: User,
     @Body() dto: CreateBookingDto,
   ): Promise<Booking> {
@@ -38,7 +38,7 @@ export class BookingsController {
 
   @ApiOperation({ summary: 'List my bookings' })
   @Get('me')
-  findOwn(
+  getMyBookings(
     @CurrentUser() user: User,
     @Query() query: ListBookingsQueryDto,
   ): Promise<Paginated<Booking>> {
@@ -47,7 +47,7 @@ export class BookingsController {
 
   @ApiOperation({ summary: 'Get one of my bookings' })
   @Get(':id')
-  findOne(
+  getMyBooking(
     @CurrentUser() user: User,
     @Param('id', ParseIntPipe) id: number,
   ): Promise<Booking> {
@@ -56,7 +56,7 @@ export class BookingsController {
 
   @ApiOperation({ summary: 'Cancel my booking while it is still pending' })
   @Patch(':id/cancel')
-  cancel(
+  cancelBooking(
     @CurrentUser() user: User,
     @Param('id', ParseIntPipe) id: number,
   ): Promise<BookingStatusChange> {

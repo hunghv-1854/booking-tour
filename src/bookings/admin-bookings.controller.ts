@@ -30,7 +30,7 @@ export class AdminBookingsController {
 
   @ApiOperation({ summary: '[Admin] List booking requests' })
   @Get()
-  findAll(
+  getBookings(
     @Query() query: AdminListBookingsQueryDto,
   ): Promise<Paginated<Booking>> {
     return this.adminBookingsService.findAll(query);
@@ -38,19 +38,21 @@ export class AdminBookingsController {
 
   @ApiOperation({ summary: '[Admin] Get a booking by id' })
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number): Promise<Booking> {
+  getBooking(@Param('id', ParseIntPipe) id: number): Promise<Booking> {
     return this.adminBookingsService.findByIdOrThrow(id);
   }
 
   @ApiOperation({ summary: '[Admin] Approve a pending booking' })
   @Patch(':id/approve')
-  approve(@Param('id', ParseIntPipe) id: number): Promise<BookingStatusChange> {
+  approveBooking(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<BookingStatusChange> {
     return this.adminBookingsService.approve(id);
   }
 
   @ApiOperation({ summary: '[Admin] Reject a pending booking' })
   @Patch(':id/reject')
-  reject(
+  rejectBooking(
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: RejectBookingDto,
   ): Promise<BookingStatusChange> {

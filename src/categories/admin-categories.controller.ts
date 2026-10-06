@@ -33,7 +33,7 @@ export class AdminCategoriesController {
 
   @ApiOperation({ summary: '[Admin] List categories' })
   @Get()
-  findAll(
+  getCategories(
     @Query() query: ListCategoriesQueryDto,
   ): Promise<Paginated<Category>> {
     return this.categoriesService.findAll(query);
@@ -41,19 +41,19 @@ export class AdminCategoriesController {
 
   @ApiOperation({ summary: '[Admin] Get a category by id' })
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number): Promise<Category> {
+  getCategory(@Param('id', ParseIntPipe) id: number): Promise<Category> {
     return this.categoriesService.findByIdOrThrow(id);
   }
 
   @ApiOperation({ summary: '[Admin] Create a category' })
   @Post()
-  create(@Body() dto: CreateCategoryDto): Promise<Category> {
+  createCategory(@Body() dto: CreateCategoryDto): Promise<Category> {
     return this.categoriesService.create(dto);
   }
 
   @ApiOperation({ summary: '[Admin] Update a category' })
   @Patch(':id')
-  update(
+  updateCategory(
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: UpdateCategoryDto,
   ): Promise<Category> {
@@ -63,7 +63,7 @@ export class AdminCategoriesController {
   @ApiOperation({ summary: '[Admin] Delete a category' })
   @Delete(':id')
   @HttpCode(204)
-  async remove(@Param('id', ParseIntPipe) id: number): Promise<void> {
+  async deleteCategory(@Param('id', ParseIntPipe) id: number): Promise<void> {
     await this.categoriesService.remove(id);
   }
 }

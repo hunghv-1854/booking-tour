@@ -33,25 +33,25 @@ export class AdminToursController {
 
   @ApiOperation({ summary: '[Admin] List tours' })
   @Get()
-  findAll(@Query() query: ToursFilterQueryDto): Promise<Paginated<Tour>> {
+  getTours(@Query() query: ToursFilterQueryDto): Promise<Paginated<Tour>> {
     return this.adminToursService.findAll(query);
   }
 
   @ApiOperation({ summary: '[Admin] Get a tour by id' })
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number): Promise<Tour> {
+  getTour(@Param('id', ParseIntPipe) id: number): Promise<Tour> {
     return this.adminToursService.findByIdOrThrow(id);
   }
 
   @ApiOperation({ summary: '[Admin] Create a tour with its itinerary' })
   @Post()
-  create(@Body() dto: CreateTourDto): Promise<Tour> {
+  createTour(@Body() dto: CreateTourDto): Promise<Tour> {
     return this.adminToursService.create(dto);
   }
 
   @ApiOperation({ summary: '[Admin] Update a tour' })
   @Patch(':id')
-  update(
+  updateTour(
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: UpdateTourDto,
   ): Promise<Tour> {
@@ -61,7 +61,7 @@ export class AdminToursController {
   @ApiOperation({ summary: '[Admin] Soft delete a tour' })
   @Delete(':id')
   @HttpCode(204)
-  async remove(@Param('id', ParseIntPipe) id: number): Promise<void> {
+  async deleteTour(@Param('id', ParseIntPipe) id: number): Promise<void> {
     await this.adminToursService.remove(id);
   }
 }

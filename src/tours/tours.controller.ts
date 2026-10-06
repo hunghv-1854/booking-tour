@@ -13,13 +13,15 @@ export class ToursController {
 
   @ApiOperation({ summary: 'List available tours' })
   @Get()
-  findAll(@Query() query: ListToursQueryDto): Promise<Paginated<TourListItem>> {
+  getTours(
+    @Query() query: ListToursQueryDto,
+  ): Promise<Paginated<TourListItem>> {
     return this.toursService.findAll(query);
   }
 
   @ApiOperation({ summary: 'Search tours by start/end date' })
   @Get('search')
-  search(
+  searchTours(
     @Query() query: SearchToursQueryDto,
   ): Promise<Paginated<TourSearchItem>> {
     return this.toursService.search(query);
@@ -27,7 +29,7 @@ export class ToursController {
 
   @ApiOperation({ summary: 'Get tour detail' })
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number): Promise<TourDetail> {
+  getTourDetail(@Param('id', ParseIntPipe) id: number): Promise<TourDetail> {
     return this.toursService.findDetail(id);
   }
 }
