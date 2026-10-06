@@ -1,0 +1,10 @@
+{
+  "not_found": "Booking was not found",
+  "tour_not_found": "Tour was not found",
+  "start_date_out_of_range": "must be between {from} and {to}",
+  "not_enough_slots": "Only {available} slots left for this tour",
+  "not_pending": "Only pending bookings can be {action}",
+  "action_cancelled": "cancelled",
+  "action_approved": "approved",
+  "action_rejected": "rejected"
+}

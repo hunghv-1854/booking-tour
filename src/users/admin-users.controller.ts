@@ -31,19 +31,19 @@ export class AdminUsersController {
 
   @ApiOperation({ summary: '[Admin] List users' })
   @Get()
-  findAll(@Query() query: ListUsersQueryDto): Promise<Paginated<User>> {
+  getUsers(@Query() query: ListUsersQueryDto): Promise<Paginated<User>> {
     return this.usersService.findAll(query);
   }
 
   @ApiOperation({ summary: '[Admin] Get a user by id' })
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number): Promise<User> {
+  getUser(@Param('id', ParseIntPipe) id: number): Promise<User> {
     return this.usersService.findByIdOrThrow(id);
   }
 
   @ApiOperation({ summary: "[Admin] Update a user's role/status" })
   @Patch(':id')
-  update(
+  updateUserRoleStatus(
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: UpdateUserRoleDto,
   ): Promise<User> {
@@ -53,7 +53,7 @@ export class AdminUsersController {
   @ApiOperation({ summary: '[Admin] Delete a user' })
   @Delete(':id')
   @HttpCode(204)
-  async remove(@Param('id', ParseIntPipe) id: number): Promise<void> {
+  async deleteUser(@Param('id', ParseIntPipe) id: number): Promise<void> {
     await this.usersService.deleteById(id);
   }
 }
