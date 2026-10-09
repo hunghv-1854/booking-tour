@@ -1,0 +1,6 @@
+{
+  "not_eligible": "You can only review a tour after completing a booking that has not been reviewed yet",
+  "already_reviewed": "This booking has already been reviewed",
+  "not_found": "Review was not found",
+  "tour_not_found": "Tour was not found"
+}

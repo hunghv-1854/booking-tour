@@ -9,6 +9,7 @@ import { BookingsModule } from './bookings/bookings.module';
 import { CategoriesModule } from './categories/categories.module';
 import { DatabaseModule } from './database/database.module';
 import { RedisModule } from './redis/redis.module';
+import { ReviewsModule } from './reviews/reviews.module';
 import { ToursModule } from './tours/tours.module';
 
 @Module({
@@ -43,6 +44,7 @@ import { ToursModule } from './tours/tours.module';
     CategoriesModule,
     ToursModule,
     BookingsModule,
+    ReviewsModule,
   ],
 })
 export class AppModule {}

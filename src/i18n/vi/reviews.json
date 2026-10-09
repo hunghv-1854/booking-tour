@@ -1,0 +1,6 @@
+{
+  "not_eligible": "Bạn chỉ có thể review tour sau khi hoàn thành một booking chưa được review",
+  "already_reviewed": "Booking này đã được review",
+  "not_found": "Không tìm thấy review",
+  "tour_not_found": "Không tìm thấy tour"
+}

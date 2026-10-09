@@ -1,1 +1,2 @@
 export const FOREIGN_KEY_VIOLATION = '23503';
+export const UNIQUE_VIOLATION = '23505';
