@@ -1,0 +1,6 @@
+{
+  "booking_approved_subject": "Your booking #{bookingId} has been approved",
+  "booking_approved_body": "Hi {fullName},\n\nYour booking #{bookingId} for \"{tourName}\" starting on {startDate} has been approved. See you soon!\n\nBooking Tour",
+  "booking_rejected_subject": "Your booking #{bookingId} has been rejected",
+  "booking_rejected_body": "Hi {fullName},\n\nUnfortunately your booking #{bookingId} for \"{tourName}\" starting on {startDate} has been rejected.\nReason: {reason}\n\nBooking Tour"
+}

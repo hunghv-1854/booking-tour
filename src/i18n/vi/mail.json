@@ -1,0 +1,6 @@
+{
+  "booking_approved_subject": "Booking #{bookingId} của bạn đã được duyệt",
+  "booking_approved_body": "Xin chào {fullName},\n\nBooking #{bookingId} cho tour \"{tourName}\" khởi hành ngày {startDate} đã được duyệt. Hẹn gặp bạn!\n\nBooking Tour",
+  "booking_rejected_subject": "Booking #{bookingId} của bạn đã bị từ chối",
+  "booking_rejected_body": "Xin chào {fullName},\n\nRất tiếc, booking #{bookingId} cho tour \"{tourName}\" khởi hành ngày {startDate} đã bị từ chối.\nLý do: {reason}\n\nBooking Tour"
+}

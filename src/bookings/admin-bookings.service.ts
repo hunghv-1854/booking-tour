@@ -4,6 +4,7 @@ import { I18nService } from 'nestjs-i18n';
 import { Repository } from 'typeorm';
 import { paginate } from '../common/pagination/paginate.util';
 import { Paginated } from '../common/pagination/pagination.interface';
+import { BookingNotificationService } from '../notifications/booking-notification.service';
 import { BookingStatus } from './booking-status.enum';
 import { BookingStatusChange } from './booking-status-change.interface';
 import { BookingTransitionService } from './booking-transition.service';
@@ -23,6 +24,7 @@ export class AdminBookingsService {
     @InjectRepository(Booking)
     private readonly bookingsRepository: Repository<Booking>,
     private readonly bookingTransitionService: BookingTransitionService,
+    private readonly bookingNotificationService: BookingNotificationService,
     private readonly i18n: I18nService,
   ) {}
 
@@ -53,18 +55,31 @@ export class AdminBookingsService {
     return booking;
   }
 
-  approve(id: number): Promise<BookingStatusChange> {
-    return this.bookingTransitionService.fromPending(
+  async approve(id: number): Promise<BookingStatusChange> {
+    const change = await this.bookingTransitionService.fromPending(
       id,
       BookingStatus.APPROVED,
     );
+    await this.bookingNotificationService.notifyStatusChanged(
+      id,
+      change.status,
+    );
+    return change;
   }
 
-  reject(id: number, dto: RejectBookingDto): Promise<BookingStatusChange> {
-    return this.bookingTransitionService.fromPending(
+  async reject(
+    id: number,
+    dto: RejectBookingDto,
+  ): Promise<BookingStatusChange> {
+    const change = await this.bookingTransitionService.fromPending(
       id,
       BookingStatus.REJECTED,
       { rejectReason: dto.reason },
     );
+    await this.bookingNotificationService.notifyStatusChanged(
+      id,
+      change.status,
+    );
+    return change;
   }
 }

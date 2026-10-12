@@ -52,7 +52,8 @@ Mock project thực hành NestJS: xây dựng backend API cho hệ thống đặ
 
 **System**
 
-- [ ] Gửi email thông báo khi approve/reject request đặt tour
+- [x] Gửi email thông báo khi approve/reject request đặt tour
+- [x] Tự chuyển booking đã approve sang `completed` khi tour kết thúc (cron 1h sáng mỗi ngày)
 
 ## Setup
 
@@ -64,6 +65,8 @@ npm run migration:run
 npm run seed:admin
 npm run start:dev
 ```
+
+> Email (dev) gửi qua Mailpit trong docker-compose: SMTP `1026`, xem hộp thư tại `http://localhost:8026`.
 
 > Postgres/Redis chạy ở port `5433`/`6380` (khác mặc định `5432`/`6379`) để không đụng port với `nestjs-tutorial` nếu chạy song song trên cùng máy.
 
