@@ -1,3 +1,6 @@
+import { Attachment } from '../attachments/attachment.entity';
+import { Tour } from './tour.entity';
+
 export interface TourRating {
   avgRating: number | null;
   reviewCount: number;
@@ -39,4 +42,8 @@ export interface TourDetail extends TourRating {
   category: { id: number; name: string };
   images: string[];
   itinerary: TourItineraryItem[];
+}
+
+export interface AdminTourDetail extends Tour {
+  images: Attachment[];
 }

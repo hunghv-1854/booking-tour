@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 import {
   IsArray,
   IsDateString,
@@ -12,10 +12,12 @@ import {
   ValidateNested,
 } from 'class-validator';
 import { i18nValidationMessage } from 'nestjs-i18n';
+import { parseJsonArrayOf } from '../tours-dto.util';
 import { TourItineraryDto } from './tour-itinerary.dto';
 
 export class CreateTourDto {
   @ApiProperty({ example: 2 })
+  @Type(() => Number)
   @IsInt({ message: i18nValidationMessage('validation.is_int') })
   categoryId: number;
 
@@ -35,11 +37,13 @@ export class CreateTourDto {
   description: string;
 
   @ApiProperty({ example: 4500000 })
+  @Type(() => Number)
   @IsNumber({}, { message: i18nValidationMessage('validation.is_number') })
   @Min(0, { message: i18nValidationMessage('validation.min') })
   price: number;
 
   @ApiProperty({ example: 4, description: 'Number of days' })
+  @Type(() => Number)
   @IsInt({ message: i18nValidationMessage('validation.is_int') })
   @Min(1, { message: i18nValidationMessage('validation.min') })
   duration: number;
@@ -64,6 +68,7 @@ export class CreateTourDto {
   endDate: string;
 
   @ApiProperty({ example: 15 })
+  @Type(() => Number)
   @IsInt({ message: i18nValidationMessage('validation.is_int') })
   @Min(1, { message: i18nValidationMessage('validation.min') })
   maxSlot: number;
@@ -71,6 +76,7 @@ export class CreateTourDto {
   @ApiPropertyOptional({ type: [TourItineraryDto] })
   @IsOptional()
   @IsArray({ message: i18nValidationMessage('validation.is_array') })
+  @Transform(parseJsonArrayOf(TourItineraryDto))
   @ValidateNested({ each: true })
   @Type(() => TourItineraryDto)
   itineraries?: TourItineraryDto[];

@@ -61,3 +61,45 @@ export const TOUR_SORT_ORDER: Record<
 export const RATING_DECIMAL_PLACES = 1;
 
 export const EMPTY_RATING: TourRating = { avgRating: null, reviewCount: 0 };
+
+export const TOUR_IMAGES_BODY_SCHEMA = {
+  type: 'object',
+  properties: {
+    images: { type: 'array', items: { type: 'string', format: 'binary' } },
+  },
+};
+
+export const CREATE_TOUR_FORM_SCHEMA = {
+  type: 'object',
+  required: [
+    'categoryId',
+    'name',
+    'slug',
+    'description',
+    'price',
+    'duration',
+    'location',
+    'startDate',
+    'endDate',
+    'maxSlot',
+  ],
+  properties: {
+    categoryId: { type: 'integer', example: 1 },
+    name: { type: 'string', example: 'Tour Phú Quốc 4N3Đ' },
+    slug: { type: 'string', example: 'tour-phu-quoc-4n3d' },
+    description: { type: 'string', example: 'Khám phá đảo ngọc Phú Quốc' },
+    price: { type: 'number', example: 4500000 },
+    duration: { type: 'integer', example: 4 },
+    location: { type: 'string', example: 'Phú Quốc' },
+    startDate: { type: 'string', format: 'date', example: '2026-11-01' },
+    endDate: { type: 'string', format: 'date', example: '2026-11-04' },
+    maxSlot: { type: 'integer', example: 15 },
+    itineraries: {
+      type: 'string',
+      description: 'JSON array',
+      example:
+        '[{"dayNumber":1,"title":"Bay ra đảo"},{"dayNumber":2,"title":"Nam đảo"}]',
+    },
+    images: { type: 'array', items: { type: 'string', format: 'binary' } },
+  },
+};

@@ -1,0 +1,4 @@
+{
+  "invalid_image_type": "must be a JPEG, PNG or WEBP image",
+  "image_not_found": "Image was not found"
+}

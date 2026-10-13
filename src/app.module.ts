@@ -2,6 +2,11 @@ import { BullModule } from '@nestjs/bullmq';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ScheduleModule } from '@nestjs/schedule';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import {
+  PUBLIC_DIR,
+  UPLOADS_URL_PREFIX,
+} from './attachments/attachments.constants';
 import { AcceptLanguageResolver, I18nModule, QueryResolver } from 'nestjs-i18n';
 import { join } from 'path';
 import { AuthModule } from './auth/auth.module';
@@ -38,6 +43,10 @@ import { ToursModule } from './tours/tours.module';
       }),
     }),
     ScheduleModule.forRoot(),
+    ServeStaticModule.forRoot({
+      rootPath: join(PUBLIC_DIR, UPLOADS_URL_PREFIX),
+      serveRoot: UPLOADS_URL_PREFIX,
+    }),
     DatabaseModule,
     RedisModule,
     AuthModule,

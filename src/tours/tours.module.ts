@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Attachment } from '../attachments/attachment.entity';
+import { AttachmentsModule } from '../attachments/attachments.module';
 import { Booking } from '../bookings/booking.entity';
 import { Category } from '../categories/category.entity';
 import { Review } from '../reviews/review.entity';
@@ -21,6 +22,7 @@ import { ToursService } from './tours.service';
       Booking,
       Attachment,
     ]),
+    AttachmentsModule,
   ],
   controllers: [ToursController, AdminToursController],
   providers: [ToursService, AdminToursService],
