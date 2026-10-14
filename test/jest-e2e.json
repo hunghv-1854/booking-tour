@@ -1,10 +1,33 @@
 {
   "moduleFileExtensions": ["js", "json", "ts"],
-  "rootDir": ".",
+  "rootDir": "..",
+  "roots": ["<rootDir>/test"],
   "testEnvironment": "node",
   "testRegex": ".e2e-spec.ts$",
-  "passWithNoTests": true,
+  "testTimeout": 30000,
+  "maxWorkers": 1,
+  "globalSetup": "<rootDir>/test/setup/global-setup.ts",
+  "setupFiles": ["<rootDir>/test/setup/load-env.ts"],
   "transform": {
-    "^.+\\.(t|j)s$": "ts-jest"
-  }
+    "^.+\\.(t|j)s$": [
+      "ts-jest",
+      {
+        "tsconfig": {
+          "allowJs": true,
+          "module": "commonjs",
+          "moduleResolution": "node",
+          "resolvePackageJsonExports": false
+        }
+      }
+    ]
+  },
+  "transformIgnorePatterns": [
+    "/node_modules/(?!(@nestjs/(bullmq|bull-shared|schedule)|nodemailer)/)"
+  ],
+  "collectCoverageFrom": [
+    "src/bookings/**/*.ts",
+    "!src/bookings/**/*.spec.ts",
+    "!src/bookings/booking-completion.task.ts"
+  ],
+  "coverageDirectory": "<rootDir>/coverage-e2e"
 }

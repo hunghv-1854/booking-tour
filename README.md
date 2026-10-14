@@ -109,7 +109,16 @@ Unit test (`src/**/*.spec.ts`) tập trung vào logic nghiệp vụ của servic
 
 ### E2E testing
 
-Chưa có e2e test thật (`test/jest-e2e.json` mới có config, chưa có file `*.e2e-spec.ts`) — `npm run test:e2e` dùng `passWithNoTests` để không đỏ CI. Sẽ triển khai đầy đủ ở B6, theo mô hình `nestjs-tutorial`: database test riêng (`.env.test`), truncate toàn bộ bảng sau mỗi test case, seed fixture trước mỗi test, coverage mức C2 (mọi nhánh điều kiện) cho ít nhất 1 controller.
+```bash
+$ npm run test:e2e        # chạy e2e
+$ npm run test:e2e:cov    # kèm coverage cho module bookings (coverage-e2e/)
+```
+
+- **Database test riêng**: cấu hình trong `.env.test` (`DB_NAME=booking_tour_test`). `test/setup/global-setup.ts` tự tạo database nếu chưa có và chạy toàn bộ migration trước khi test. Biến môi trường có sẵn (VD trên CI) được ưu tiên hơn `.env.test`.
+- **Mỗi test case độc lập**: `beforeEach` seed fixture (`test/fixtures/booking.fixtures.ts`: admin, 2 user, 3 tour, 3 booking), `afterEach` `TRUNCATE ... RESTART IDENTITY CASCADE` toàn bộ bảng.
+- App được dựng giống production qua `configureApp()` (`src/app.setup.ts`: prefix `/api`, `ValidationPipe`, format lỗi 422); riêng queue gửi email được mock để assert job được đẩy.
+- **Coverage C2** cho `BookingsController` + `AdminBookingsController` (và service đi kèm): mọi nhánh điều kiện nghiệp vụ đều có test — 401/403, validate, tour không tồn tại, ngày ngoài khoảng (trước khi mở, quá muộn, đã qua), hết slot, đặt đồng thời không oversell, filter/pagination, xem/huỷ booking người khác, huỷ/duyệt/từ chối khi không còn pending, hoàn slot, gửi email. Các branch còn báo "uncovered" trong report là code do `emitDecoratorMetadata` sinh ở constructor/decorator, không phải logic.
+- Jest e2e transform thêm các package chỉ có bản ESM (`@nestjs/bullmq`, `@nestjs/bull-shared`, `@nestjs/schedule`, `nodemailer`) sang CommonJS.
 
 ## Database migration
 
