@@ -97,6 +97,16 @@ $ npm run test:e2e
 $ npm run test:cov
 ```
 
+### Unit test
+
+Unit test (`src/**/*.spec.ts`) tập trung vào logic nghiệp vụ của service, mock repository/DataSource qua `Test.createTestingModule` (helper chung ở `src/common/testing/`):
+
+- `BookingsService`, `BookingTransitionService`, `booking.util`: khoảng ngày đặt tour, hết slot, tính tổng tiền, chuyển trạng thái + hoàn slot
+- `AdminToursService`, `tours-validation.util`: validate tạo/sửa tour, resize `maxSlot`, thay itinerary
+- `ReviewsService`: điều kiện review (1 query), unique violation → 409
+- `AuthService`: login, refresh token rotation, logout blacklist
+- `BookingNotificationProcessor`, `RemoveUploadsOnErrorInterceptor`, `validationExceptionFactory`
+
 ### E2E testing
 
 Chưa có e2e test thật (`test/jest-e2e.json` mới có config, chưa có file `*.e2e-spec.ts`) — `npm run test:e2e` dùng `passWithNoTests` để không đỏ CI. Sẽ triển khai đầy đủ ở B6, theo mô hình `nestjs-tutorial`: database test riêng (`.env.test`), truncate toàn bộ bảng sau mỗi test case, seed fixture trước mỗi test, coverage mức C2 (mọi nhánh điều kiện) cho ít nhất 1 controller.
