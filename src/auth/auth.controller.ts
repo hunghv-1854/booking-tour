@@ -1,17 +1,27 @@
-import { Body, Controller, HttpCode, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import { ApiOperation, ApiSecurity, ApiTags } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import type {
   LoginResponse,
   LogoutResponse,
+  OAuthProfile,
   RegisterResponse,
   TokenPair,
 } from './auth.types';
 import { AuthToken } from './decorators/auth-token.decorator';
+import { CurrentOAuthProfile } from './decorators/oauth-profile.decorator';
 import { LoginDto } from './dto/login.dto';
 import { LogoutDto } from './dto/logout.dto';
 import { RefreshDto } from './dto/refresh.dto';
 import { RegisterDto } from './dto/register.dto';
+import { GoogleAuthGuard } from './guards/google-auth.guard';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 
 @ApiTags('auth')
@@ -51,5 +61,21 @@ export class AuthController {
     @Body() dto: LogoutDto,
   ): Promise<LogoutResponse> {
     return this.authService.logout(token, dto.refreshToken);
+  }
+
+  @ApiOperation({
+    summary: 'Log in with Google (open in a browser, redirects to Google)',
+  })
+  @Get('google')
+  @UseGuards(GoogleAuthGuard)
+  googleLogin(): void {}
+
+  @ApiOperation({ summary: 'Google OAuth callback, returns the token pair' })
+  @Get('google/callback')
+  @UseGuards(GoogleAuthGuard)
+  googleCallback(
+    @CurrentOAuthProfile() profile: OAuthProfile,
+  ): Promise<LoginResponse> {
+    return this.authService.loginWithOAuth(profile);
   }
 }

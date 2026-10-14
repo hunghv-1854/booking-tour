@@ -10,3 +10,6 @@ export const PASSWORD_SALT_ROUNDS = 10;
 
 /** Matches the duration strings accepted by `jsonwebtoken`'s `expiresIn`, e.g. '15m', '7d'. */
 export type Duration = `${number}${'s' | 'm' | 'h' | 'd' | 'w' | 'y'}`;
+
+export const GOOGLE_STRATEGY = 'google';
+export const GOOGLE_SCOPES = ['email', 'profile'];

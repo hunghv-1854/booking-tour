@@ -40,7 +40,7 @@ Mock project thực hành NestJS: xây dựng backend API cho hệ thống đặ
 - [x] Tìm kiếm tour
 - [x] Quản lý profile (fullName, phone, upload avatar)
 - [x] Hủy tour khi chưa được admin confirm
-- [ ] Đăng nhập qua mạng xã hội
+- [x] Đăng nhập qua mạng xã hội (Google)
 
 **Admin**
 
@@ -71,6 +71,15 @@ npm run start:dev
 > Email (dev) gửi qua Mailpit trong docker-compose: SMTP `1026`, xem hộp thư tại `http://localhost:8026`.
 
 > Postgres/Redis chạy ở port `5433`/`6380` (khác mặc định `5432`/`6379`) để không đụng port với `nestjs-tutorial` nếu chạy song song trên cùng máy.
+
+### Đăng nhập Google
+
+1. Tạo OAuth Client ID (loại *Web application*) tại Google Cloud Console → APIs & Services → Credentials
+2. Thêm *Authorized redirect URI*: `http://localhost:3000/api/auth/google/callback`
+3. Điền `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` vào `.env`
+4. Mở `http://localhost:3000/api/auth/google` trên trình duyệt → đăng nhập Google → callback trả về `accessToken`, `refreshToken`, `user`
+
+Tài khoản Google được liên kết qua bảng `user_oauth_accounts`: đã liên kết thì đăng nhập luôn, trùng email với user có sẵn thì liên kết vào user đó, chưa có thì tạo user mới.
 
 API base path: `http://localhost:3000/api` (VD: `POST /api/auth/register`)
 Swagger docs: `http://localhost:3000/docs`
