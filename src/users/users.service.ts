@@ -1,7 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
+import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { I18nService } from 'nestjs-i18n';
-import { Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
+import { removeFilesByUrl } from '../attachments/attachment-file.util';
+import { AttachmentsService } from '../attachments/attachments.service';
 import { paginate } from '../common/pagination/paginate.util';
 import { selectColumns } from '../common/query/select-columns.util';
 import { Paginated } from '../common/pagination/pagination.interface';
@@ -10,6 +12,8 @@ import { ListUsersQueryDto } from './dto/list-users-query.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { UpdateUserRoleDto } from './dto/update-user-role.dto';
 import { User } from './user.entity';
+import { UserProfile } from './users.interface';
+import { toUserProfile } from './users.mapper';
 import {
   AUTH_USER_SELECT,
   PUBLIC_USER_SELECT,
@@ -21,6 +25,9 @@ export class UsersService {
   constructor(
     @InjectRepository(User)
     private readonly usersRepository: Repository<User>,
+    @InjectDataSource()
+    private readonly dataSource: DataSource,
+    private readonly attachmentsService: AttachmentsService,
     private readonly i18n: I18nService,
   ) {}
 
@@ -91,12 +98,33 @@ export class UsersService {
     return this.findByIdOrThrow(id);
   }
 
-  async updateProfile(id: number, dto: UpdateProfileDto): Promise<User> {
-    const result = await this.usersRepository.update(id, dto);
-    if (!result.affected) {
-      throw new NotFoundException(this.i18n.t('users.not_found'));
-    }
-    return this.findByIdOrThrow(id);
+  async getProfile(id: number): Promise<UserProfile> {
+    const [user, avatar] = await Promise.all([
+      this.findByIdOrThrow(id),
+      this.attachmentsService.findAvatarUrl(id),
+    ]);
+    return toUserProfile(user, avatar);
+  }
+
+  async updateProfile(
+    id: number,
+    dto: UpdateProfileDto,
+    avatar?: Express.Multer.File,
+  ): Promise<UserProfile> {
+    const replacedUrls = await this.dataSource.transaction(async (manager) => {
+      if (Object.keys(dto).length) {
+        await manager.update(User, id, dto);
+      }
+      if (!avatar) return [];
+      const replacement = await this.attachmentsService.replaceAvatar(
+        manager,
+        id,
+        avatar,
+      );
+      return replacement.replacedUrls;
+    });
+    await removeFilesByUrl(replacedUrls);
+    return this.getProfile(id);
   }
 
   async deleteById(id: number): Promise<void> {

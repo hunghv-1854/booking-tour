@@ -38,14 +38,14 @@ Mock project thực hành NestJS: xây dựng backend API cho hệ thống đặ
 - [x] Xem tour đã đặt
 - [x] Thêm review cho tour
 - [x] Tìm kiếm tour
-- [x] Quản lý profile (update fullName/phone — upload avatar để dành B4)
+- [x] Quản lý profile (fullName, phone, upload avatar)
 - [x] Hủy tour khi chưa được admin confirm
 - [ ] Đăng nhập qua mạng xã hội
 
 **Admin**
 
 - [x] Quản lý user
-- [x] Quản lý tour (CRUD) (upload ảnh tour làm cùng PR upload file)
+- [x] Quản lý tour (CRUD, upload/xoá ảnh tour)
 - [x] Quản lý review
 - [x] Quản lý yêu cầu đặt tour (approve/reject)
 - [x] Quản lý category (CRUD)
@@ -65,6 +65,8 @@ npm run migration:run
 npm run seed:admin
 npm run start:dev
 ```
+
+> File upload (avatar, ảnh tour) lưu ở `public/uploads/{avatars,tours}`, truy cập qua `http://localhost:3000/uploads/...`. Chỉ nhận JPEG/PNG/WEBP, tối đa 5MB/file.
 
 > Email (dev) gửi qua Mailpit trong docker-compose: SMTP `1026`, xem hộp thư tại `http://localhost:8026`.
 

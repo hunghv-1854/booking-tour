@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { I18nService } from 'nestjs-i18n';
 import { DataSource, EntityManager, Not, Repository } from 'typeorm';
+import { AttachmentsService } from '../attachments/attachments.service';
 import { Category } from '../categories/category.entity';
 import { paginate } from '../common/pagination/paginate.util';
 import { Paginated } from '../common/pagination/pagination.interface';
@@ -18,6 +19,7 @@ import {
   TOUR_DETAIL_SELECT,
   TOUR_UPDATE_CHECK_SELECT,
 } from './tours.constants';
+import { AdminTourDetail } from './tours.interface';
 import { applyToursFilter } from './tours-query.util';
 import { assertDateRange, assertItineraryDays } from './tours-validation.util';
 
@@ -30,6 +32,7 @@ export class AdminToursService {
     private readonly categoriesRepository: Repository<Category>,
     @InjectDataSource()
     private readonly dataSource: DataSource,
+    private readonly attachmentsService: AttachmentsService,
     private readonly i18n: I18nService,
   ) {}
 
@@ -43,7 +46,7 @@ export class AdminToursService {
     return paginate(qb.orderBy('tour.id', 'ASC'), query);
   }
 
-  async findByIdOrThrow(id: number): Promise<Tour> {
+  async findByIdOrThrow(id: number): Promise<AdminTourDetail> {
     const tour = await this.toursRepository.findOne({
       where: { id },
       relations: { category: true, itineraries: true },
@@ -53,10 +56,31 @@ export class AdminToursService {
     if (!tour) {
       throw new NotFoundException(this.i18n.t('tours.not_found'));
     }
-    return tour;
+    const images = await this.attachmentsService.findTourImages(id);
+    return { ...tour, images };
   }
 
-  async create(dto: CreateTourDto): Promise<Tour> {
+  async addImages(
+    id: number,
+    images: Express.Multer.File[] = [],
+  ): Promise<AdminTourDetail> {
+    await this.assertTourExists(id);
+    await this.attachmentsService.addTourImages(
+      this.dataSource.manager,
+      id,
+      images,
+    );
+    return this.findByIdOrThrow(id);
+  }
+
+  async removeImage(id: number, imageId: string): Promise<void> {
+    await this.attachmentsService.removeTourImage(id, imageId);
+  }
+
+  async create(
+    dto: CreateTourDto,
+    images: Express.Multer.File[] = [],
+  ): Promise<AdminTourDetail> {
     const { itineraries = [], ...tourData } = dto;
     assertDateRange(this.i18n, dto.startDate, dto.endDate);
     assertItineraryDays(
@@ -74,12 +98,13 @@ export class AdminToursService {
         manager.create(Tour, { ...tourData, availableSlot: dto.maxSlot }),
       );
       await this.insertItineraries(manager, tour.id, itineraries);
+      await this.attachmentsService.addTourImages(manager, tour.id, images);
       return tour.id;
     });
     return this.findByIdOrThrow(id);
   }
 
-  async update(id: number, dto: UpdateTourDto): Promise<Tour> {
+  async update(id: number, dto: UpdateTourDto): Promise<AdminTourDetail> {
     const current = await this.toursRepository.findOne({
       where: { id },
       select: TOUR_UPDATE_CHECK_SELECT,
@@ -166,6 +191,13 @@ export class AdminToursService {
       TourItinerary,
       itineraries.map((item) => ({ ...item, tourId })),
     );
+  }
+
+  private async assertTourExists(id: number): Promise<void> {
+    const exists = await this.toursRepository.exists({ where: { id } });
+    if (!exists) {
+      throw new NotFoundException(this.i18n.t('tours.not_found'));
+    }
   }
 
   private async assertCategoryExists(categoryId: number): Promise<void> {
