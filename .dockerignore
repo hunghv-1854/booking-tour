@@ -1,0 +1,11 @@
+node_modules
+dist
+coverage
+coverage-e2e
+public/uploads
+tmp
+.git
+.github
+.claude
+.env
+.env.*

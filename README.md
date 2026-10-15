@@ -162,3 +162,44 @@ GitHub Actions (`.github/workflows/ci.yml`) chạy tự động mỗi khi mở/c
   - `migration:run` → `migration:generate --check` (fail nếu entity bị sửa mà quên tạo migration) → `migration:revert` → `migration:run` lại (đảm bảo `down()` của migration mới nhất chạy được)
   - `seed:admin` 2 lần (boot toàn bộ app context + kiểm tra idempotent)
   - `npm test`, `npm run test:e2e`
+
+## Deploy (Railway) & CD
+
+App chạy trên [Railway](https://railway.com) bằng `Dockerfile` (cấu hình ở `railway.json`): container chạy `migration:run:prod` → `seed:admin:prod` (idempotent) → `node dist/main`, health check `/docs`.
+
+**CD**: job `Deploy to Railway` trong `.github/workflows/ci.yml` chỉ chạy khi push lên `main` **và** 2 job lint/build + test đã pass → `railway up --ci` build image và deploy, job fail nếu build/deploy lỗi. PR chỉ chạy CI, không deploy.
+
+Thiết lập 1 lần:
+
+1. Railway: tạo project → **+ New** → **Database → PostgreSQL** và **Database → Redis** → **+ New → Empty Service** (đặt tên `booking-tour`). Không kết nối GitHub repo cho service này (để chỉ CD trong GitHub Actions được deploy sau khi test pass).
+2. Service `booking-tour` → **Variables** (dùng reference tới DB/Redis của Railway):
+   ```
+   DB_HOST=${{Postgres.PGHOST}}
+   DB_PORT=${{Postgres.PGPORT}}
+   DB_USERNAME=${{Postgres.PGUSER}}
+   DB_PASSWORD=${{Postgres.PGPASSWORD}}
+   DB_NAME=${{Postgres.PGDATABASE}}
+   REDIS_HOST=${{Redis.REDISHOST}}
+   REDIS_PORT=${{Redis.REDISPORT}}
+   REDIS_PASSWORD=${{Redis.REDISPASSWORD}}
+   JWT_SECRET=<chuỗi ngẫu nhiên>
+   JWT_ACCESS_EXPIRES_IN=15m
+   JWT_REFRESH_SECRET=<chuỗi ngẫu nhiên khác>
+   JWT_REFRESH_EXPIRES_IN=7d
+   MAIL_HOST=smtp.gmail.com
+   MAIL_PORT=465
+   MAIL_USER=<gmail>
+   MAIL_PASSWORD=<Gmail App Password>
+   MAIL_FROM=Booking Tour <gmail>
+   GOOGLE_CLIENT_ID=...
+   GOOGLE_CLIENT_SECRET=...
+   GOOGLE_CALLBACK_URL=https://<domain>/api/auth/google/callback
+   SEED_ADMIN_EMAIL=...
+   SEED_ADMIN_PASSWORD=...
+   ```
+3. Service → **Settings → Networking → Generate Domain** (lấy `<domain>`); **Settings → Volumes** (hoặc chuột phải service → Attach Volume) mount path `/app/public/uploads` để ảnh upload không mất khi redeploy.
+4. Project **Settings → Tokens** → tạo Project Token (environment `production`); lấy Service ID ở service **Settings** (hoặc URL `.../service/<id>`).
+5. GitHub repo → **Settings → Secrets and variables → Actions**: thêm `RAILWAY_TOKEN`, `RAILWAY_SERVICE_ID`.
+6. Google Cloud Console: thêm redirect URI `https://<domain>/api/auth/google/callback`.
+
+Sau đó mỗi lần merge PR vào `main` sẽ tự deploy; theo dõi ở tab **Actions** (GitHub) và **Deployments** (Railway).
