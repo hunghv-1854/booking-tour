@@ -18,6 +18,7 @@ import {
   JwtPayload,
   LoginResponse,
   LogoutResponse,
+  OAuthProfile,
   RefreshTokenPayload,
   RegisterResponse,
   TokenPair,
@@ -68,6 +69,22 @@ export class AuthService {
       });
     }
 
+    if (user.status === UserStatus.LOCKED) {
+      throw new UnauthorizedException({
+        errors: { email: [this.i18n.t('auth.account_locked')] },
+      });
+    }
+
+    return {
+      ...(await this.issueTokenPair(user)),
+      user: toAuthenticatedUser(user),
+    };
+  }
+
+  async loginWithOAuth(profile: OAuthProfile): Promise<LoginResponse> {
+    const user = await this.usersService.findOrCreateByOAuth(profile, () =>
+      this.hashPassword(randomUUID()),
+    );
     if (user.status === UserStatus.LOCKED) {
       throw new UnauthorizedException({
         errors: { email: [this.i18n.t('auth.account_locked')] },

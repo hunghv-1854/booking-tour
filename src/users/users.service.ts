@@ -4,6 +4,8 @@ import { I18nService } from 'nestjs-i18n';
 import { DataSource, Repository } from 'typeorm';
 import { removeFilesByUrl } from '../attachments/attachment-file.util';
 import { AttachmentsService } from '../attachments/attachments.service';
+import type { OAuthProfile } from '../auth/auth.types';
+import { isUniqueViolation } from '../common/postgres-error.util';
 import { paginate } from '../common/pagination/paginate.util';
 import { selectColumns } from '../common/query/select-columns.util';
 import { Paginated } from '../common/pagination/pagination.interface';
@@ -11,11 +13,13 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { ListUsersQueryDto } from './dto/list-users-query.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { UpdateUserRoleDto } from './dto/update-user-role.dto';
+import { UserOAuthAccount } from './user-oauth-account.entity';
 import { User } from './user.entity';
 import { UserProfile } from './users.interface';
 import { toUserProfile } from './users.mapper';
 import {
   AUTH_USER_SELECT,
+  OAUTH_ACCOUNT_USER_SELECT,
   PUBLIC_USER_SELECT,
   USER_CREDENTIALS_SELECT,
 } from './users.constants';
@@ -25,6 +29,8 @@ export class UsersService {
   constructor(
     @InjectRepository(User)
     private readonly usersRepository: Repository<User>,
+    @InjectRepository(UserOAuthAccount)
+    private readonly oauthAccountsRepository: Repository<UserOAuthAccount>,
     @InjectDataSource()
     private readonly dataSource: DataSource,
     private readonly attachmentsService: AttachmentsService,
@@ -51,12 +57,62 @@ export class UsersService {
     });
   }
 
+  async findOrCreateByOAuth(
+    profile: OAuthProfile,
+    generatePassword: () => Promise<string>,
+  ): Promise<User> {
+    const linked = await this.findByOAuthAccount(profile);
+    if (linked) return linked;
+
+    try {
+      return await this.dataSource.transaction(async (manager) => {
+        const email = profile.email.toLowerCase();
+        const existing = await manager.findOne(User, {
+          where: { email },
+          select: AUTH_USER_SELECT,
+        });
+        const user =
+          existing ??
+          (await manager.save(
+            manager.create(User, {
+              email,
+              fullName: profile.fullName,
+              password: await generatePassword(),
+            }),
+          ));
+        await manager.insert(UserOAuthAccount, {
+          userId: user.id,
+          provider: profile.provider,
+          providerUserId: profile.providerUserId,
+        });
+        return user;
+      });
+    } catch (error) {
+      if (!isUniqueViolation(error)) throw error;
+      const user = await this.findByOAuthAccount(profile);
+      if (!user) throw error;
+      return user;
+    }
+  }
+
   create(data: CreateUserDto): Promise<User> {
     const user = this.usersRepository.create({
       ...data,
       email: data.email.toLowerCase(),
     });
     return this.usersRepository.save(user);
+  }
+
+  private async findByOAuthAccount({
+    provider,
+    providerUserId,
+  }: OAuthProfile): Promise<User | null> {
+    const account = await this.oauthAccountsRepository.findOne({
+      where: { provider, providerUserId },
+      relations: { user: true },
+      select: OAUTH_ACCOUNT_USER_SELECT,
+    });
+    return account?.user ?? null;
   }
 
   async findAll(query: ListUsersQueryDto): Promise<Paginated<User>> {

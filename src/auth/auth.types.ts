@@ -1,3 +1,4 @@
+import { OAuthProvider } from '../users/oauth-provider.enum';
 import { UserRole } from '../users/user-role.enum';
 
 export interface JwtPayload {
@@ -39,4 +40,11 @@ export interface RegisterResponse {
 
 export interface LogoutResponse {
   message: string;
+}
+
+export interface OAuthProfile {
+  provider: OAuthProvider;
+  providerUserId: string;
+  email: string;
+  fullName: string;
 }

@@ -29,3 +29,8 @@ export const UPDATE_PROFILE_BODY_SCHEMA = {
     avatar: { type: 'string', format: 'binary' },
   },
 };
+
+export const OAUTH_ACCOUNT_USER_SELECT = {
+  id: true,
+  user: AUTH_USER_SELECT,
+} as const;
