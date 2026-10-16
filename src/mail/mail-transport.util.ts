@@ -1,6 +1,6 @@
 import { ConfigService } from '@nestjs/config';
 import SMTPTransport from 'nodemailer/lib/smtp-transport';
-import { SMTPS_PORT } from './mail.constants';
+import { SMTP_TIMEOUT_MS, SMTPS_PORT } from './mail.constants';
 
 export function mailTransportOptions(
   configService: ConfigService,
@@ -11,6 +11,9 @@ export function mailTransportOptions(
     host: configService.getOrThrow<string>('MAIL_HOST'),
     port,
     secure: port === SMTPS_PORT,
+    connectionTimeout: SMTP_TIMEOUT_MS,
+    greetingTimeout: SMTP_TIMEOUT_MS,
+    socketTimeout: SMTP_TIMEOUT_MS,
     auth: user
       ? { user, pass: configService.getOrThrow<string>('MAIL_PASSWORD') }
       : undefined,

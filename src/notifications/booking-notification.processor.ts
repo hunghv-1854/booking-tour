@@ -1,4 +1,4 @@
-import { Processor, WorkerHost } from '@nestjs/bullmq';
+import { OnWorkerEvent, Processor, WorkerHost } from '@nestjs/bullmq';
 import { Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Job } from 'bullmq';
@@ -57,6 +57,13 @@ export class BookingNotificationProcessor extends WorkerHost {
     });
     this.logger.log(
       `Sent ${data.status} email for booking #${booking.id} to ${booking.user.email}`,
+    );
+  }
+
+  @OnWorkerEvent('failed')
+  onFailed(job: Job<BookingStatusChangedJob> | undefined, error: Error): void {
+    this.logger.error(
+      `Failed to send ${job?.data.status} email for booking #${job?.data.bookingId} (attempt ${job?.attemptsMade}/${job?.opts.attempts}): ${error.message}`,
     );
   }
 }

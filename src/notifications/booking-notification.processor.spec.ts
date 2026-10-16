@@ -1,3 +1,4 @@
+import { Logger } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Job } from 'bullmq';
@@ -11,6 +12,7 @@ import { BookingStatusChangedJob } from './notifications.interface';
 
 jest.mock('@nestjs/bullmq', () => ({
   Processor: () => () => undefined,
+  OnWorkerEvent: () => () => undefined,
   WorkerHost: class {},
 }));
 
@@ -71,5 +73,24 @@ describe('BookingNotificationProcessor', () => {
       subject: 'mail.booking_rejected_subject',
       text: 'mail.booking_rejected_body',
     });
+  });
+
+  it('logs the reason and attempt when a job fails', () => {
+    const errorSpy = jest
+      .spyOn(Logger.prototype, 'error')
+      .mockImplementation(() => undefined);
+
+    processor.onFailed(
+      {
+        data: { bookingId: 8, status: BookingStatus.APPROVED, lang: 'vi' },
+        attemptsMade: 3,
+        opts: { attempts: 3 },
+      } as Job<BookingStatusChangedJob>,
+      new Error('Connection timeout'),
+    );
+
+    expect(errorSpy).toHaveBeenCalledWith(
+      'Failed to send approved email for booking #8 (attempt 3/3): Connection timeout',
+    );
   });
 });
