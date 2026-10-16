@@ -186,17 +186,17 @@ Thiết lập 1 lần:
    JWT_ACCESS_EXPIRES_IN=15m
    JWT_REFRESH_SECRET=<chuỗi ngẫu nhiên khác>
    JWT_REFRESH_EXPIRES_IN=7d
-   MAIL_HOST=smtp.gmail.com
+   BREVO_API_KEY=<Brevo API key>
+   MAIL_FROM=Booking Tour <email đã xác minh trên Brevo>
+   MAIL_HOST=unused
    MAIL_PORT=465
-   MAIL_USER=<gmail>
-   MAIL_PASSWORD=<Gmail App Password>
-   MAIL_FROM=Booking Tour <gmail>
    GOOGLE_CLIENT_ID=...
    GOOGLE_CLIENT_SECRET=...
    GOOGLE_CALLBACK_URL=https://<domain>/api/auth/google/callback
    SEED_ADMIN_EMAIL=...
    SEED_ADMIN_PASSWORD=...
    ```
+   > Railway chặn SMTP ra ngoài ở gói Trial/Hobby, nên production gửi mail qua **Brevo HTTP API** (HTTPS): tạo tài khoản Brevo → xác minh 1 sender (**Senders, Domains & Dedicated IPs → Senders**) → **SMTP & API → API Keys** → tạo key. Có `BREVO_API_KEY` thì app gửi qua API, không có thì dùng SMTP (`MAIL_HOST`/`MAIL_PORT`, local là Mailpit).
 3. Service → **Settings → Networking → Generate Domain** (lấy `<domain>`); **Settings → Volumes** (hoặc chuột phải service → Attach Volume) mount path `/app/public/uploads` để ảnh upload không mất khi redeploy.
 4. Project **Settings → Tokens** → tạo Project Token (environment `production`); lấy Service ID ở service **Settings** (hoặc URL `.../service/<id>`).
 5. GitHub repo → **Settings → Secrets and variables → Actions**: thêm `RAILWAY_TOKEN`, `RAILWAY_SERVICE_ID`.
