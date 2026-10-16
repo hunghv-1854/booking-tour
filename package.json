@@ -23,7 +23,8 @@
     "migration:create": "typeorm-ts-node-commonjs migration:create",
     "migration:run": "npm run typeorm -- migration:run",
     "migration:revert": "npm run typeorm -- migration:revert",
-    "seed:admin": "ts-node -r tsconfig-paths/register src/database/seeds/admin.seed.ts"
+    "seed:admin": "ts-node -r tsconfig-paths/register src/database/seeds/admin.seed.ts",
+    "test:e2e:cov": "jest --config ./test/jest-e2e.json --coverage"
   },
   "dependencies": {
     "@nestjs/bullmq": "^12.0.0",

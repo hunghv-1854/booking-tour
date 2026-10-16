@@ -1,21 +1,11 @@
-import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
-import { RemoveUploadsOnErrorInterceptor } from './attachments/remove-uploads-on-error.interceptor';
-import { validationExceptionFactory } from './common/validation-exception-factory';
+import { configureApp } from './app.setup';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  app.setGlobalPrefix('api');
-  app.useGlobalInterceptors(new RemoveUploadsOnErrorInterceptor());
-  app.useGlobalPipes(
-    new ValidationPipe({
-      whitelist: true,
-      transform: true,
-      exceptionFactory: validationExceptionFactory,
-    }),
-  );
+  configureApp(app);
 
   const config = new DocumentBuilder()
     .setTitle('Booking Tour API')
