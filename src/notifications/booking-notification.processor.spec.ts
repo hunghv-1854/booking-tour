@@ -3,20 +3,20 @@ import { Test } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Job } from 'bullmq';
 import { I18nService } from 'nestjs-i18n';
-import { BookingStatus } from '../bookings/booking-status.enum';
 import { Booking } from '../bookings/booking.entity';
 import { createI18nMock } from '../common/testing/i18n.mock';
 import { MailService } from '../mail/mail.service';
 import { BookingNotificationProcessor } from './booking-notification.processor';
-import { BookingStatusChangedJob } from './notifications.interface';
+import { NotificationTemplate } from './notification-template.enum';
+import { BookingNotificationJob } from './notifications.interface';
 
 describe('BookingNotificationProcessor', () => {
   let processor: BookingNotificationProcessor;
   const bookingsRepository = { findOne: jest.fn() };
   const mailService = { send: jest.fn() };
   const i18n = createI18nMock();
-  const jobOf = (data: BookingStatusChangedJob) =>
-    ({ data }) as Job<BookingStatusChangedJob>;
+  const jobOf = (data: BookingNotificationJob) =>
+    ({ data }) as Job<BookingNotificationJob>;
 
   beforeEach(async () => {
     jest.clearAllMocks();
@@ -35,7 +35,11 @@ describe('BookingNotificationProcessor', () => {
     bookingsRepository.findOne.mockResolvedValue(null);
 
     await processor.process(
-      jobOf({ bookingId: 1, status: BookingStatus.APPROVED, lang: 'vi' }),
+      jobOf({
+        bookingId: 1,
+        template: NotificationTemplate.BOOKING_APPROVED,
+        lang: 'vi',
+      }),
     );
 
     expect(mailService.send).not.toHaveBeenCalled();
@@ -51,7 +55,11 @@ describe('BookingNotificationProcessor', () => {
     });
 
     await processor.process(
-      jobOf({ bookingId: 8, status: BookingStatus.REJECTED, lang: 'en' }),
+      jobOf({
+        bookingId: 8,
+        template: NotificationTemplate.BOOKING_REJECTED,
+        lang: 'en',
+      }),
     );
 
     expect(i18n.t).toHaveBeenCalledWith('mail.booking_rejected_subject', {
@@ -76,15 +84,19 @@ describe('BookingNotificationProcessor', () => {
 
     processor.onFailed(
       {
-        data: { bookingId: 8, status: BookingStatus.APPROVED, lang: 'vi' },
+        data: {
+          bookingId: 8,
+          template: NotificationTemplate.BOOKING_APPROVED,
+          lang: 'vi',
+        },
         attemptsMade: 3,
         opts: { attempts: 3 },
-      } as Job<BookingStatusChangedJob>,
+      } as Job<BookingNotificationJob>,
       new Error('Connection timeout'),
     );
 
     expect(errorSpy).toHaveBeenCalledWith(
-      'Failed to send approved email for booking #8 (attempt 3/3): Connection timeout',
+      'Failed to send booking_approved email for booking #8 (attempt 3/3): Connection timeout',
     );
   });
 });

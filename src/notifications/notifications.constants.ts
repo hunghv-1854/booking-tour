@@ -1,5 +1,8 @@
+import { BookingStatus } from '../bookings/booking-status.enum';
+import { NotificationTemplate } from './notification-template.enum';
+
 export const BOOKING_NOTIFICATION_QUEUE = 'booking-notifications';
-export const BOOKING_STATUS_CHANGED_JOB = 'booking-status-changed';
+export const BOOKING_NOTIFICATION_JOB = 'booking-notification';
 
 export const BOOKING_NOTIFICATION_JOB_OPTIONS = {
   attempts: 3,
@@ -34,3 +37,12 @@ export const ACCOUNT_NOTIFICATION_USER_SELECT = {
   email: true,
   fullName: true,
 } as const;
+
+export const SCHEDULED_NOTIFICATION_RETENTION_SECONDS = 7 * 24 * 60 * 60;
+
+export const STATUS_NOTIFICATION_TEMPLATES: Partial<
+  Record<BookingStatus, NotificationTemplate>
+> = {
+  [BookingStatus.APPROVED]: NotificationTemplate.BOOKING_APPROVED,
+  [BookingStatus.REJECTED]: NotificationTemplate.BOOKING_REJECTED,
+};

@@ -72,3 +72,9 @@ export const ADMIN_BOOKING_LIST_COLUMNS = [
 ];
 
 export const ADMIN_BOOKING_KEYWORD_COLUMNS = ['tour.name', 'user.email'];
+
+export const BOOKING_COMPLETION_CRON = '0 0 1 * * *';
+export const BOOKING_EXPIRATION_CRON = '0 0 * * * *';
+export const BOOKING_REMINDER_CRON = '0 0 8 * * *';
+export const BOOKING_REMINDER_DAYS_BEFORE = 1;
+export const BOOKING_REMINDER_SELECT = { id: true } as const;

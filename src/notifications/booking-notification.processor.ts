@@ -10,7 +10,7 @@ import {
   BOOKING_NOTIFICATION_QUEUE,
   BOOKING_NOTIFICATION_SELECT,
 } from './notifications.constants';
-import { BookingStatusChangedJob } from './notifications.interface';
+import { BookingNotificationJob } from './notifications.interface';
 
 @Processor(BOOKING_NOTIFICATION_QUEUE)
 export class BookingNotificationProcessor extends WorkerHost {
@@ -25,7 +25,7 @@ export class BookingNotificationProcessor extends WorkerHost {
     super();
   }
 
-  async process({ data }: Job<BookingStatusChangedJob>): Promise<void> {
+  async process({ data }: Job<BookingNotificationJob>): Promise<void> {
     const booking = await this.bookingsRepository.findOne({
       where: { id: data.bookingId },
       relations: { user: true, tour: true },
@@ -45,7 +45,7 @@ export class BookingNotificationProcessor extends WorkerHost {
       reason: booking.rejectReason,
     };
     const t = (key: string) =>
-      this.i18n.t(`mail.booking_${data.status}_${key}`, {
+      this.i18n.t(`mail.${data.template}_${key}`, {
         lang: data.lang,
         args,
       });
@@ -56,14 +56,14 @@ export class BookingNotificationProcessor extends WorkerHost {
       text: t('body'),
     });
     this.logger.log(
-      `Sent ${data.status} email for booking #${booking.id} to ${booking.user.email}`,
+      `Sent ${data.template} email for booking #${booking.id} to ${booking.user.email}`,
     );
   }
 
   @OnWorkerEvent('failed')
-  onFailed(job: Job<BookingStatusChangedJob> | undefined, error: Error): void {
+  onFailed(job: Job<BookingNotificationJob> | undefined, error: Error): void {
     this.logger.error(
-      `Failed to send ${job?.data.status} email for booking #${job?.data.bookingId} (attempt ${job?.attemptsMade}/${job?.opts.attempts}): ${error.message}`,
+      `Failed to send ${job?.data.template} email for booking #${job?.data.bookingId} (attempt ${job?.attemptsMade}/${job?.opts.attempts}): ${error.message}`,
     );
   }
 }

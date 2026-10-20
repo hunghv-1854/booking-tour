@@ -6,5 +6,6 @@
   "not_pending": "Only pending bookings can be {action}",
   "action_cancelled": "cancelled",
   "action_approved": "approved",
-  "action_rejected": "rejected"
+  "action_rejected": "rejected",
+  "auto_reject_reason": "The booking was not approved before the departure date"
 }

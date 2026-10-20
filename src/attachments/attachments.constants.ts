@@ -28,3 +28,7 @@ export const ATTACHMENT_SELECT = {
 } as const;
 
 export const ATTACHMENT_FILE_SELECT = { id: true, url: true } as const;
+
+export const UPLOAD_CLEANUP_CRON = '0 0 3 * * 0';
+export const ORPHAN_FILE_MIN_AGE_MS = 24 * 60 * 60 * 1000;
+export const ATTACHMENT_URL_SELECT = { url: true } as const;

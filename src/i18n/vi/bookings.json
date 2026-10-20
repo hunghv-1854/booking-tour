@@ -6,5 +6,6 @@
   "not_pending": "Chỉ booking đang chờ duyệt mới được {action}",
   "action_cancelled": "huỷ",
   "action_approved": "duyệt",
-  "action_rejected": "từ chối"
+  "action_rejected": "từ chối",
+  "auto_reject_reason": "Booking chưa được duyệt trước ngày khởi hành"
 }
