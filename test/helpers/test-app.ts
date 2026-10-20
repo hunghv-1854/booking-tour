@@ -9,12 +9,15 @@ import { BookingNotificationService } from '../../src/notifications/booking-noti
 export interface TestApp {
   app: INestApplication;
   dataSource: DataSource;
-  notifications: { notifyStatusChanged: jest.Mock };
+  notifications: { notifyStatusChanged: jest.Mock; notifyMany: jest.Mock };
   accountNotifications: { sendPasswordToken: jest.Mock };
 }
 
 export async function createTestApp(): Promise<TestApp> {
-  const notifications = { notifyStatusChanged: jest.fn() };
+  const notifications = {
+    notifyStatusChanged: jest.fn(),
+    notifyMany: jest.fn(),
+  };
   const accountNotifications = { sendPasswordToken: jest.fn() };
   const moduleRef = await Test.createTestingModule({ imports: [AppModule] })
     .overrideProvider(BookingNotificationService)

@@ -84,6 +84,21 @@ Tài khoản Google được liên kết qua bảng `user_oauth_accounts`: đã 
 API base path: `http://localhost:3000/api` (VD: `POST /api/auth/register`)
 Swagger docs: `http://localhost:3000/docs`
 
+## Scheduled jobs (cron)
+
+Chạy bằng `@nestjs/schedule`, theo giờ Việt Nam (`Asia/Ho_Chi_Minh`). Email được đẩy vào queue BullMQ (`booking-notifications`), `jobId` = `<template>-<bookingId>` nên cron chạy lại không gửi trùng.
+
+| Job | Lịch | Việc |
+|---|---|---|
+| `BookingExpirationTask` | Mỗi giờ | Booking còn `pending` khi đã tới ngày khởi hành → `rejected` (lý do tự động), hoàn slot cho tour, email báo user |
+| `BookingReminderTask` | 08:00 mỗi ngày | Booking `approved` khởi hành ngày mai → email nhắc lịch |
+| `BookingCompletionTask` | 01:00 mỗi ngày | Booking `approved` đã qua ngày kết thúc → `completed`, email mời review |
+| `UploadCleanupTask` | 03:00 Chủ nhật | Xoá file trong `public/uploads` cũ hơn 24h mà không còn bản ghi `attachments` |
+
+Các job đều idempotent (chạy lại không đổi kết quả), có unit test (`src/bookings/booking-scheduled-tasks.spec.ts`, `src/attachments/upload-cleanup.task.spec.ts`) và e2e (`test/scheduled-jobs.e2e-spec.ts`). Khi chạy nhiều instance, mỗi instance đều chạy cron → nên chuyển sang BullMQ repeatable job hoặc lock Redis.
+
+Dự kiến thêm khi có thanh toán: huỷ booking giữ chỗ quá hạn chưa thanh toán (delayed job + cron dự phòng), đối soát giao dịch treo với cổng thanh toán.
+
 ## Test
 
 ```bash
