@@ -8,13 +8,15 @@ import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { randomUUID } from 'crypto';
 import { I18nService } from 'nestjs-i18n';
+import { fieldError } from '../common/validation/field-error.util';
 import { RedisService } from '../redis/redis.service';
 import { User } from '../users/user.entity';
 import { UserStatus } from '../users/user-status.enum';
 import { UsersService } from '../users/users.service';
 import { toAuthenticatedUser } from '../users/users.mapper';
-import { Duration, PASSWORD_SALT_ROUNDS } from './auth.constants';
+import { Duration } from './auth.constants';
 import {
+  ChangePasswordResponse,
   JwtPayload,
   LoginResponse,
   LogoutResponse,
@@ -23,8 +25,10 @@ import {
   RegisterResponse,
   TokenPair,
 } from './auth.types';
+import { ChangePasswordDto } from './dto/change-password.dto';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
+import { hashPassword } from './password.util';
 
 @Injectable()
 export class AuthService {
@@ -42,7 +46,7 @@ export class AuthService {
     const created = await this.usersService.create({
       email: dto.email,
       fullName: dto.fullName,
-      password: await this.hashPassword(dto.password),
+      password: await hashPassword(dto.password),
     });
 
     return {
@@ -83,7 +87,7 @@ export class AuthService {
 
   async loginWithOAuth(profile: OAuthProfile): Promise<LoginResponse> {
     const user = await this.usersService.findOrCreateByOAuth(profile, () =>
-      this.hashPassword(randomUUID()),
+      hashPassword(randomUUID()),
     );
     if (user.status === UserStatus.LOCKED) {
       throw new UnauthorizedException({
@@ -115,6 +119,28 @@ export class AuthService {
     }
 
     return this.issueTokenPair(user);
+  }
+
+  async changePassword(
+    userId: number,
+    { currentPassword, newPassword }: ChangePasswordDto,
+  ): Promise<ChangePasswordResponse> {
+    const user = await this.usersService.findCredentialsById(userId);
+    if (!user || !(await bcrypt.compare(currentPassword, user.password))) {
+      throw fieldError(
+        'currentPassword',
+        this.i18n.t('auth.invalid_current_password'),
+      );
+    }
+    if (currentPassword === newPassword) {
+      throw fieldError('newPassword', this.i18n.t('auth.same_password'));
+    }
+
+    await this.usersService.updatePassword(
+      userId,
+      await hashPassword(newPassword),
+    );
+    return { message: this.i18n.t('auth.password_changed') };
   }
 
   async logout(
@@ -188,9 +214,5 @@ export class AuthService {
         errors: { email: [this.i18n.t('auth.email_taken')] },
       });
     }
-  }
-
-  private hashPassword(plain: string): Promise<string> {
-    return bcrypt.hash(plain, PASSWORD_SALT_ROUNDS);
   }
 }

@@ -3,31 +3,43 @@ import {
   Controller,
   Get,
   HttpCode,
+  Patch,
   Post,
   UseGuards,
 } from '@nestjs/common';
 import { ApiOperation, ApiSecurity, ApiTags } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import type {
+  ChangePasswordResponse,
   LoginResponse,
   LogoutResponse,
+  PasswordResetResponse,
   OAuthProfile,
   RegisterResponse,
   TokenPair,
 } from './auth.types';
+import { User } from '../users/user.entity';
 import { AuthToken } from './decorators/auth-token.decorator';
+import { CurrentUser } from './decorators/current-user.decorator';
 import { CurrentOAuthProfile } from './decorators/oauth-profile.decorator';
+import { ChangePasswordDto } from './dto/change-password.dto';
+import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { LoginDto } from './dto/login.dto';
 import { LogoutDto } from './dto/logout.dto';
 import { RefreshDto } from './dto/refresh.dto';
 import { RegisterDto } from './dto/register.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
 import { GoogleAuthGuard } from './guards/google-auth.guard';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { PasswordResetService } from './password-reset.service';
 
 @ApiTags('auth')
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly passwordResetService: PasswordResetService,
+  ) {}
 
   @ApiOperation({ summary: 'Register a new user' })
   @Post('register')
@@ -49,6 +61,33 @@ export class AuthController {
   @HttpCode(200)
   refresh(@Body() dto: RefreshDto): Promise<TokenPair> {
     return this.authService.refresh(dto.refreshToken);
+  }
+
+  @ApiOperation({ summary: 'Request a password reset email' })
+  @Post('forgot-password')
+  @HttpCode(200)
+  forgotPassword(
+    @Body() dto: ForgotPasswordDto,
+  ): Promise<PasswordResetResponse> {
+    return this.passwordResetService.requestReset(dto);
+  }
+
+  @ApiOperation({ summary: 'Set a new password with the emailed token' })
+  @Post('reset-password')
+  @HttpCode(200)
+  resetPassword(@Body() dto: ResetPasswordDto): Promise<PasswordResetResponse> {
+    return this.passwordResetService.reset(dto);
+  }
+
+  @ApiOperation({ summary: 'Change my password' })
+  @ApiSecurity('token')
+  @Patch('password')
+  @UseGuards(JwtAuthGuard)
+  changePassword(
+    @CurrentUser() user: User,
+    @Body() dto: ChangePasswordDto,
+  ): Promise<ChangePasswordResponse> {
+    return this.authService.changePassword(user.id, dto);
   }
 
   @ApiOperation({ summary: 'Log out the current session' })

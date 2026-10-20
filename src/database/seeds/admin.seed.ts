@@ -1,9 +1,10 @@
 import { Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
-import * as bcrypt from 'bcrypt';
 import { AppModule } from '../../app.module';
-import { PASSWORD_SALT_ROUNDS } from '../../auth/auth.constants';
+import { PasswordResetService } from '../../auth/password-reset.service';
+import { generateResetToken, hashPassword } from '../../auth/password.util';
+import { isUniqueViolation } from '../../common/postgres-error.util';
 import { UserRole } from '../../users/user-role.enum';
 import { UsersService } from '../../users/users.service';
 
@@ -13,24 +14,27 @@ async function bootstrap(): Promise<void> {
   const app = await NestFactory.createApplicationContext(AppModule);
 
   try {
-    const configService = app.get(ConfigService);
+    const email = app.get(ConfigService).getOrThrow<string>('SEED_ADMIN_EMAIL');
     const usersService = app.get(UsersService);
-
-    const email = configService.getOrThrow<string>('SEED_ADMIN_EMAIL');
-    const password = configService.getOrThrow<string>('SEED_ADMIN_PASSWORD');
 
     if (await usersService.existsByEmail(email)) {
       logger.log(`Admin user already exists, skip seeding: ${email}`);
       return;
     }
 
-    await usersService.create({
-      email,
-      password: await bcrypt.hash(password, PASSWORD_SALT_ROUNDS),
-      fullName: 'Admin',
-      role: UserRole.ADMIN,
-    });
-    logger.log(`Seeded admin user: ${email}`);
+    try {
+      const admin = await usersService.create({
+        email,
+        password: await hashPassword(generateResetToken()),
+        fullName: 'Admin',
+        role: UserRole.ADMIN,
+      });
+      await app.get(PasswordResetService).sendAccountSetup(admin.id);
+      logger.log(`Seeded admin user and sent account setup email: ${email}`);
+    } catch (error) {
+      if (!isUniqueViolation(error)) throw error;
+      logger.log(`Admin user was seeded concurrently, skip: ${email}`);
+    }
   } finally {
     await app.close();
   }

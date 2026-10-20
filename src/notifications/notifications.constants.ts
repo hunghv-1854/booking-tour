@@ -18,3 +18,19 @@ export const BOOKING_NOTIFICATION_SELECT = {
   user: { id: true, email: true, fullName: true },
   tour: { id: true, name: true },
 } as const;
+
+export const ACCOUNT_NOTIFICATION_QUEUE = 'account-notifications';
+export const ACCOUNT_NOTIFICATION_JOB = 'account-notification';
+
+export const ACCOUNT_NOTIFICATION_JOB_OPTIONS = {
+  attempts: 3,
+  backoff: { type: 'exponential', delay: 5000 },
+  removeOnComplete: true,
+  removeOnFail: true,
+};
+
+export const ACCOUNT_NOTIFICATION_USER_SELECT = {
+  id: true,
+  email: true,
+  fullName: true,
+} as const;

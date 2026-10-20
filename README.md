@@ -144,7 +144,16 @@ $ npm run migration:revert
 $ npm run seed:admin
 ```
 
-Tạo sẵn 1 tài khoản `role: admin` (email/password lấy từ `SEED_ADMIN_EMAIL`/`SEED_ADMIN_PASSWORD` trong `.env`) — vì API `POST /api/auth/register` chỉ tạo được `role: user`. Chạy lại nhiều lần an toàn (idempotent): nếu email đã tồn tại thì bỏ qua, không tạo trùng.
+Tạo sẵn 1 tài khoản `role: admin` (email lấy từ `SEED_ADMIN_EMAIL`) — vì API `POST /api/auth/register` chỉ tạo được `role: user`. Chạy lại nhiều lần an toàn (idempotent): nếu email đã tồn tại thì bỏ qua, không tạo trùng.
+
+**Không có mật khẩu nào được gửi đi**: admin được tạo với mật khẩu ngẫu nhiên không ai biết, hệ thống gửi email *Thiết lập tài khoản* tới `SEED_ADMIN_EMAIL` chứa token dùng 1 lần (hạn 24h) → admin tự đặt mật khẩu qua `POST /api/auth/reset-password`. Vì vậy `SEED_ADMIN_EMAIL` phải là hộp thư nhận được mail (local: xem ở Mailpit).
+
+### Quên mật khẩu
+
+- `POST /api/auth/forgot-password { email }`: luôn trả 200 cùng 1 message (không lộ email nào tồn tại); nếu user tồn tại và đang active thì gửi email chứa token đặt lại mật khẩu (hạn 30 phút).
+- `POST /api/auth/reset-password { token, newPassword }`: token đúng và còn hạn thì đổi mật khẩu; token chỉ dùng được 1 lần.
+- Redis chỉ lưu **hash SHA-256** của token (`auth:password-reset:<hash>` → userId, có TTL), lấy ra bằng `GETDEL`.
+- `PASSWORD_RESET_URL` (tuỳ chọn): nếu có, email kèm link `<url>?token=...` cho frontend.
 
 ## Lint & format
 
@@ -193,8 +202,7 @@ Thiết lập 1 lần:
    GOOGLE_CLIENT_ID=...
    GOOGLE_CLIENT_SECRET=...
    GOOGLE_CALLBACK_URL=https://<domain>/api/auth/google/callback
-   SEED_ADMIN_EMAIL=...
-   SEED_ADMIN_PASSWORD=...
+   SEED_ADMIN_EMAIL=<email nhận được mail>
    ```
    > Railway chặn SMTP ra ngoài ở gói Trial/Hobby, nên production gửi mail qua **Brevo HTTP API** (HTTPS): tạo tài khoản Brevo → xác minh 1 sender (**Senders, Domains & Dedicated IPs → Senders**) → **SMTP & API → API Keys** → tạo key. Có `BREVO_API_KEY` thì app gửi qua API, không có thì dùng SMTP (`MAIL_HOST`/`MAIL_PORT`, local là Mailpit).
 3. Service → **Settings → Networking → Generate Domain** (lấy `<domain>`); **Settings → Volumes** (hoặc chuột phải service → Attach Volume) mount path `/app/public/uploads` để ảnh upload không mất khi redeploy.
