@@ -44,6 +44,17 @@ export class UsersService {
     });
   }
 
+  findCredentialsById(id: number): Promise<User | null> {
+    return this.usersRepository.findOne({
+      where: { id },
+      select: USER_CREDENTIALS_SELECT,
+    });
+  }
+
+  async updatePassword(id: number, passwordHash: string): Promise<void> {
+    await this.usersRepository.update(id, { password: passwordHash });
+  }
+
   findById(id: number): Promise<User | null> {
     return this.usersRepository.findOne({
       where: { id },

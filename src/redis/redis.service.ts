@@ -2,6 +2,7 @@ import { Inject, Injectable, OnModuleDestroy } from '@nestjs/common';
 import type Redis from 'ioredis';
 import {
   BLACKLIST_KEY_PREFIX,
+  PASSWORD_RESET_KEY_PREFIX,
   REDIS_CLIENT,
   REFRESH_TOKEN_KEY_PREFIX,
 } from './redis.constants';
@@ -45,6 +46,28 @@ export class RedisService implements OnModuleDestroy {
 
   async revokeRefreshToken(jti: string): Promise<void> {
     await this.client.del(this.refreshKeyFor(jti));
+  }
+
+  async storePasswordResetToken(
+    tokenHash: string,
+    userId: number,
+    ttlSeconds: number,
+  ): Promise<void> {
+    await this.client.set(
+      this.passwordResetKeyFor(tokenHash),
+      String(userId),
+      'EX',
+      ttlSeconds,
+    );
+  }
+
+  async consumePasswordResetToken(tokenHash: string): Promise<number | null> {
+    const value = await this.client.getdel(this.passwordResetKeyFor(tokenHash));
+    return value === null ? null : Number(value);
+  }
+
+  private passwordResetKeyFor(tokenHash: string): string {
+    return `${PASSWORD_RESET_KEY_PREFIX}${tokenHash}`;
   }
 
   private keyFor(jti: string): string {

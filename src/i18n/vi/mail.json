@@ -2,5 +2,9 @@
   "booking_approved_subject": "Booking #{bookingId} của bạn đã được duyệt",
   "booking_approved_body": "Xin chào {fullName},\n\nBooking #{bookingId} cho tour \"{tourName}\" khởi hành ngày {startDate} đã được duyệt. Hẹn gặp bạn!\n\nBooking Tour",
   "booking_rejected_subject": "Booking #{bookingId} của bạn đã bị từ chối",
-  "booking_rejected_body": "Xin chào {fullName},\n\nRất tiếc, booking #{bookingId} cho tour \"{tourName}\" khởi hành ngày {startDate} đã bị từ chối.\nLý do: {reason}\n\nBooking Tour"
+  "booking_rejected_body": "Xin chào {fullName},\n\nRất tiếc, booking #{bookingId} cho tour \"{tourName}\" khởi hành ngày {startDate} đã bị từ chối.\nLý do: {reason}\n\nBooking Tour",
+  "password_reset_subject": "Đặt lại mật khẩu Booking Tour",
+  "password_reset_body": "Xin chào {fullName},\n\nChúng tôi nhận được yêu cầu đặt lại mật khẩu. Dùng mã dưới đây (hiệu lực {ttlMinutes} phút, dùng 1 lần):\n\n{token}\n\n{link}Nếu bạn không yêu cầu, hãy bỏ qua email này.\n\nBooking Tour",
+  "account_setup_subject": "Thiết lập tài khoản Booking Tour",
+  "account_setup_body": "Xin chào {fullName},\n\nTài khoản của bạn đã được tạo. Hãy tự đặt mật khẩu bằng mã dưới đây (hiệu lực {ttlMinutes} phút, dùng 1 lần):\n\n{token}\n\n{link}Booking Tour"
 }

@@ -10,12 +10,6 @@ import { MailService } from '../mail/mail.service';
 import { BookingNotificationProcessor } from './booking-notification.processor';
 import { BookingStatusChangedJob } from './notifications.interface';
 
-jest.mock('@nestjs/bullmq', () => ({
-  Processor: () => () => undefined,
-  OnWorkerEvent: () => () => undefined,
-  WorkerHost: class {},
-}));
-
 describe('BookingNotificationProcessor', () => {
   let processor: BookingNotificationProcessor;
   const bookingsRepository = { findOne: jest.fn() };

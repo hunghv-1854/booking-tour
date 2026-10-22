@@ -1,3 +1,4 @@
+import { todayInAppTimezone } from '../common/time/date.util';
 import { CHILD_PRICE_RATE } from './bookings.constants';
 
 export function calculateTotalPrice(
@@ -15,5 +16,5 @@ export function addDays(date: string, days: number): string {
 }
 
 export function today(): string {
-  return new Date().toISOString().slice(0, 10);
+  return todayInAppTimezone();
 }

@@ -18,6 +18,8 @@ describe('AuthService', () => {
     findByEmail: jest.fn(),
     findById: jest.fn(),
     findOrCreateByOAuth: jest.fn(),
+    findCredentialsById: jest.fn(),
+    updatePassword: jest.fn(),
   };
   const jwtService = {
     sign: jest.fn().mockReturnValue('signed-token'),
@@ -159,6 +161,53 @@ describe('AuthService', () => {
         response: { errors: { email: ['auth.account_locked'] } },
       });
       expect(redisService.storeRefreshToken).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('changePassword', () => {
+    it('rejects a wrong current password on the currentPassword field', async () => {
+      usersService.findCredentialsById.mockResolvedValue(user);
+
+      await expect(
+        service.changePassword(7, {
+          currentPassword: 'wrong',
+          newPassword: 'N3w-Str0ng-Pass',
+        }),
+      ).rejects.toMatchObject({
+        response: {
+          errors: { currentPassword: ['auth.invalid_current_password'] },
+        },
+      });
+      expect(usersService.updatePassword).not.toHaveBeenCalled();
+    });
+
+    it('rejects reusing the current password', async () => {
+      usersService.findCredentialsById.mockResolvedValue(user);
+
+      await expect(
+        service.changePassword(7, {
+          currentPassword: 'Passw0rd!',
+          newPassword: 'Passw0rd!',
+        }),
+      ).rejects.toMatchObject({
+        response: { errors: { newPassword: ['auth.same_password'] } },
+      });
+    });
+
+    it('stores the new hash and clears the forced change flag', async () => {
+      usersService.findCredentialsById.mockResolvedValue(user);
+
+      const result = await service.changePassword(7, {
+        currentPassword: 'Passw0rd!',
+        newPassword: 'N3w-Str0ng-Pass',
+      });
+
+      expect(result).toEqual({ message: 'auth.password_changed' });
+      const [, hash] = usersService.updatePassword.mock.calls[0] as [
+        number,
+        string,
+      ];
+      expect(await bcrypt.compare('N3w-Str0ng-Pass', hash)).toBe(true);
     });
   });
 

@@ -42,6 +42,14 @@ export interface LogoutResponse {
   message: string;
 }
 
+export interface ChangePasswordResponse {
+  message: string;
+}
+
+export interface PasswordResetResponse {
+  message: string;
+}
+
 export interface OAuthProfile {
   provider: OAuthProvider;
   providerUserId: string;
