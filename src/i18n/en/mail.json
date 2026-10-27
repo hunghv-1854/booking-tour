@@ -6,5 +6,9 @@
   "password_reset_subject": "Reset your Booking Tour password",
   "password_reset_body": "Hi {fullName},\n\nWe received a request to reset your password. Use the token below (valid for {ttlMinutes} minutes, single use):\n\n{token}\n\n{link}If you did not request this, you can ignore this email.\n\nBooking Tour",
   "account_setup_subject": "Set up your Booking Tour account",
-  "account_setup_body": "Hi {fullName},\n\nAn account has been created for you. Set your own password with the token below (valid for {ttlMinutes} minutes, single use):\n\n{token}\n\n{link}Booking Tour"
+  "account_setup_body": "Hi {fullName},\n\nAn account has been created for you. Set your own password with the token below (valid for {ttlMinutes} minutes, single use):\n\n{token}\n\n{link}Booking Tour",
+  "booking_reminder_subject": "Reminder: \"{tourName}\" departs tomorrow",
+  "booking_reminder_body": "Hi {fullName},\n\nYour booking #{bookingId} for \"{tourName}\" departs tomorrow ({startDate}). Please prepare your ID and arrive on time.\n\nBooking Tour",
+  "review_invitation_subject": "How was \"{tourName}\"?",
+  "review_invitation_body": "Hi {fullName},\n\nThank you for travelling with us on \"{tourName}\" (booking #{bookingId}). We would love to hear your review of the tour.\n\nBooking Tour"
 }

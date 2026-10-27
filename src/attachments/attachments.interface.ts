@@ -1,6 +1,7 @@
 import { AttachableType } from './attachable-type.enum';
 
 export interface AttachmentData {
+  id: string;
   attachableType: AttachableType;
   attachableId: number;
   url: string;
@@ -12,4 +13,9 @@ export interface AttachmentData {
 export interface AvatarReplacement {
   url: string;
   replacedUrls: string[];
+}
+
+export interface UploadedFileCandidate {
+  id: string;
+  url: string;
 }

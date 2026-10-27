@@ -1,9 +1,9 @@
 import { AccountNotificationTemplate } from './account-notification-template.enum';
-import { BookingStatus } from '../bookings/booking-status.enum';
+import { NotificationTemplate } from './notification-template.enum';
 
-export interface BookingStatusChangedJob {
+export interface BookingNotificationJob {
   bookingId: number;
-  status: BookingStatus;
+  template: NotificationTemplate;
   lang: string;
 }
 

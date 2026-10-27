@@ -6,5 +6,9 @@
   "password_reset_subject": "Đặt lại mật khẩu Booking Tour",
   "password_reset_body": "Xin chào {fullName},\n\nChúng tôi nhận được yêu cầu đặt lại mật khẩu. Dùng mã dưới đây (hiệu lực {ttlMinutes} phút, dùng 1 lần):\n\n{token}\n\n{link}Nếu bạn không yêu cầu, hãy bỏ qua email này.\n\nBooking Tour",
   "account_setup_subject": "Thiết lập tài khoản Booking Tour",
-  "account_setup_body": "Xin chào {fullName},\n\nTài khoản của bạn đã được tạo. Hãy tự đặt mật khẩu bằng mã dưới đây (hiệu lực {ttlMinutes} phút, dùng 1 lần):\n\n{token}\n\n{link}Booking Tour"
+  "account_setup_body": "Xin chào {fullName},\n\nTài khoản của bạn đã được tạo. Hãy tự đặt mật khẩu bằng mã dưới đây (hiệu lực {ttlMinutes} phút, dùng 1 lần):\n\n{token}\n\n{link}Booking Tour",
+  "booking_reminder_subject": "Nhắc lịch: tour \"{tourName}\" khởi hành ngày mai",
+  "booking_reminder_body": "Xin chào {fullName},\n\nBooking #{bookingId} cho tour \"{tourName}\" sẽ khởi hành vào ngày mai ({startDate}). Bạn nhớ chuẩn bị giấy tờ tuỳ thân và có mặt đúng giờ nhé.\n\nBooking Tour",
+  "review_invitation_subject": "Chuyến đi \"{tourName}\" của bạn thế nào?",
+  "review_invitation_body": "Xin chào {fullName},\n\nCảm ơn bạn đã đồng hành cùng chúng tôi trong tour \"{tourName}\" (booking #{bookingId}). Hãy để lại đánh giá để giúp những du khách khác nhé.\n\nBooking Tour"
 }
