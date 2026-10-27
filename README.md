@@ -97,6 +97,12 @@ Chạy bằng `@nestjs/schedule`, theo giờ Việt Nam (`Asia/Ho_Chi_Minh`). Em
 
 Các job đều idempotent (chạy lại không đổi kết quả), có unit test (`src/bookings/booking-scheduled-tasks.spec.ts`, `src/attachments/upload-cleanup.task.spec.ts`) và e2e (`test/scheduled-jobs.e2e-spec.ts`). Khi chạy nhiều instance, mỗi instance đều chạy cron → nên chuyển sang BullMQ repeatable job hoặc lock Redis.
 
+**Xử lý lỗi:**
+
+- Mỗi job chạy qua `runScheduledTask` (`src/common/scheduling/scheduled-task.util.ts`): lỗi được bắt và log kèm stack, scheduler vẫn chạy các lần sau.
+- `BookingExpirationTask` và `BookingCompletionTask` đặt UPDATE và bước đẩy email vào queue trong cùng transaction. Nếu không đẩy được (Redis lỗi) thì rollback, booking giữ nguyên trạng thái và lần chạy sau làm lại, không có booking nào đã đổi trạng thái mà mất email.
+- Gửi email lỗi thì BullMQ retry 3 lần (exponential backoff), job lỗi hẳn được log ở `@OnWorkerEvent('failed')`.
+
 Dự kiến thêm khi có thanh toán: huỷ booking giữ chỗ quá hạn chưa thanh toán (delayed job + cron dự phòng), đối soát giao dịch treo với cổng thanh toán.
 
 ## Test

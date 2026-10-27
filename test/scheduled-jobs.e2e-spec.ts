@@ -85,6 +85,27 @@ describe('Scheduled jobs (e2e)', () => {
       );
     });
 
+    it('rolls back when notifications cannot be queued so the next run retries', async () => {
+      const expired = await seedBooking({
+        status: BookingStatus.PENDING,
+        startDate: today(),
+      });
+      const slotsBefore = await availableSlotOf(fixtures.ongoingTour.id);
+      testApp.notifications.notifyMany.mockRejectedValueOnce(
+        new Error('redis down'),
+      );
+      const task = app.get(BookingExpirationTask);
+
+      await expect(task.rejectExpiredPendingBookings()).resolves.toEqual([]);
+      expect(await statusOf(expired.id)).toBe(BookingStatus.PENDING);
+      expect(await availableSlotOf(fixtures.ongoingTour.id)).toBe(slotsBefore);
+
+      await expect(task.rejectExpiredPendingBookings()).resolves.toEqual([
+        expired.id,
+      ]);
+      expect(await statusOf(expired.id)).toBe(BookingStatus.REJECTED);
+    });
+
     it('is idempotent', async () => {
       await seedBooking({ status: BookingStatus.PENDING, startDate: today() });
       const task = app.get(BookingExpirationTask);

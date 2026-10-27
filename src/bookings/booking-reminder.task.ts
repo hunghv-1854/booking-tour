@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { runScheduledTask } from '../common/scheduling/scheduled-task.util';
 import { APP_TIMEZONE } from '../common/time/time.constants';
 import { BookingNotificationService } from '../notifications/booking-notification.service';
 import { NotificationTemplate } from '../notifications/notification-template.enum';
@@ -25,20 +26,22 @@ export class BookingReminderTask {
   ) {}
 
   @Cron(BOOKING_REMINDER_CRON, { timeZone: APP_TIMEZONE })
-  async remindUpcomingDepartures(): Promise<number[]> {
-    const bookings = await this.bookingsRepository.find({
-      where: {
-        status: BookingStatus.APPROVED,
-        startDate: addDays(today(), BOOKING_REMINDER_DAYS_BEFORE),
-      },
-      select: BOOKING_REMINDER_SELECT,
+  remindUpcomingDepartures(): Promise<number[]> {
+    return runScheduledTask(this.logger, 'Departure reminder', async () => {
+      const bookings = await this.bookingsRepository.find({
+        where: {
+          status: BookingStatus.APPROVED,
+          startDate: addDays(today(), BOOKING_REMINDER_DAYS_BEFORE),
+        },
+        select: BOOKING_REMINDER_SELECT,
+      });
+      const ids = bookings.map((booking) => booking.id);
+      await this.bookingNotificationService.notifyMany(
+        ids,
+        NotificationTemplate.BOOKING_REMINDER,
+      );
+      this.logger.log(`Queued ${ids.length} departure reminders`);
+      return ids;
     });
-    const ids = bookings.map((booking) => booking.id);
-    await this.bookingNotificationService.notifyMany(
-      ids,
-      NotificationTemplate.BOOKING_REMINDER,
-    );
-    this.logger.log(`Queued ${ids.length} departure reminders`);
-    return ids;
   }
 }

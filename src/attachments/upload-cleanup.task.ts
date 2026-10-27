@@ -4,6 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { readdir, stat } from 'fs/promises';
 import { join } from 'path';
 import { In, Repository } from 'typeorm';
+import { runScheduledTask } from '../common/scheduling/scheduled-task.util';
 import { APP_TIMEZONE } from '../common/time/time.constants';
 import {
   attachmentIdFromFileName,
@@ -30,22 +31,24 @@ export class UploadCleanupTask {
   ) {}
 
   @Cron(UPLOAD_CLEANUP_CRON, { timeZone: APP_TIMEZONE })
-  async removeOrphanFiles(): Promise<string[]> {
-    const candidates = await this.findOldUploads();
-    if (!candidates.length) return [];
+  removeOrphanFiles(): Promise<string[]> {
+    return runScheduledTask(this.logger, 'Upload cleanup', async () => {
+      const candidates = await this.findOldUploads();
+      if (!candidates.length) return [];
 
-    const referenced = await this.attachmentsRepository.find({
-      where: { id: In(candidates.map((item) => item.id)) },
-      select: ATTACHMENT_ID_SELECT,
+      const referenced = await this.attachmentsRepository.find({
+        where: { id: In(candidates.map((item) => item.id)) },
+        select: ATTACHMENT_ID_SELECT,
+      });
+      const referencedIds = new Set(referenced.map((item) => item.id));
+      const orphans = candidates
+        .filter((item) => !referencedIds.has(item.id))
+        .map((item) => item.url);
+
+      await removeFilesByUrl(orphans);
+      this.logger.log(`Removed ${orphans.length} orphan uploaded files`);
+      return orphans;
     });
-    const referencedIds = new Set(referenced.map((item) => item.id));
-    const orphans = candidates
-      .filter((item) => !referencedIds.has(item.id))
-      .map((item) => item.url);
-
-    await removeFilesByUrl(orphans);
-    this.logger.log(`Removed ${orphans.length} orphan uploaded files`);
-    return orphans;
   }
 
   private async findOldUploads(): Promise<UploadedFileCandidate[]> {

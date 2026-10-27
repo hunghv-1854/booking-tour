@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
+import { runScheduledTask } from '../common/scheduling/scheduled-task.util';
 import { APP_TIMEZONE } from '../common/time/time.constants';
 import { BookingNotificationService } from '../notifications/booking-notification.service';
 import { NotificationTemplate } from '../notifications/notification-template.enum';
@@ -19,23 +20,27 @@ export class BookingCompletionTask {
   ) {}
 
   @Cron(BOOKING_COMPLETION_CRON, { timeZone: APP_TIMEZONE })
-  async completeFinishedBookings(): Promise<number[]> {
-    const [rows] = await this.dataSource.query<[{ id: number }[], number]>(
-      `UPDATE bookings AS booking
-       SET status = $1, updated_at = now()
-       FROM tours AS tour
-       WHERE tour.id = booking.tour_id
-         AND booking.status = $2
-         AND booking.start_date + tour.duration - 1 < (now() AT TIME ZONE $3)::date
-       RETURNING booking.id`,
-      [BookingStatus.COMPLETED, BookingStatus.APPROVED, APP_TIMEZONE],
+  completeFinishedBookings(): Promise<number[]> {
+    return runScheduledTask(this.logger, 'Booking completion', () =>
+      this.dataSource.transaction(async (manager) => {
+        const [rows] = await manager.query<[{ id: number }[], number]>(
+          `UPDATE bookings AS booking
+           SET status = $1, updated_at = now()
+           FROM tours AS tour
+           WHERE tour.id = booking.tour_id
+             AND booking.status = $2
+             AND booking.start_date + tour.duration - 1 < (now() AT TIME ZONE $3)::date
+           RETURNING booking.id`,
+          [BookingStatus.COMPLETED, BookingStatus.APPROVED, APP_TIMEZONE],
+        );
+        const ids = rows.map((row) => row.id);
+        await this.bookingNotificationService.notifyMany(
+          ids,
+          NotificationTemplate.REVIEW_INVITATION,
+        );
+        this.logger.log(`Marked ${ids.length} bookings as completed`);
+        return ids;
+      }),
     );
-    const ids = rows.map((row) => row.id);
-    await this.bookingNotificationService.notifyMany(
-      ids,
-      NotificationTemplate.REVIEW_INVITATION,
-    );
-    this.logger.log(`Marked ${ids.length} bookings as completed`);
-    return ids;
   }
 }
