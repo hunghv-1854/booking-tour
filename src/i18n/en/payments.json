@@ -1,0 +1,5 @@
+{
+  "booking_not_payable": "Only approved and unpaid bookings can be paid",
+  "payment_deadline_passed": "The payment deadline for this booking has passed",
+  "order_info": "Payment for booking #{bookingId}"
+}

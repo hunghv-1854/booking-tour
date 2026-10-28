@@ -13,6 +13,7 @@ import {
   BookingTransitionOptions,
 } from './booking-status-change.interface';
 import { Booking } from './booking.entity';
+import { paymentDeadline, today } from './booking.util';
 import {
   BOOKING_TRANSITION_SELECT,
   SLOT_RELEASING_STATUSES,
@@ -48,9 +49,16 @@ export class BookingTransitionService {
         );
       }
 
+      if (status === BookingStatus.APPROVED && booking.startDate <= today()) {
+        throw new ConflictException(this.i18n.t('bookings.departure_passed'));
+      }
+
       await manager.update(Booking, id, {
         status,
         ...(rejectReason !== undefined && { rejectReason }),
+        ...(status === BookingStatus.APPROVED && {
+          paymentDueAt: paymentDeadline(booking.startDate),
+        }),
       });
       if (SLOT_RELEASING_STATUSES.includes(status)) {
         await manager.increment(

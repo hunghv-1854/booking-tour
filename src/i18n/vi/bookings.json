@@ -7,5 +7,6 @@
   "action_cancelled": "huỷ",
   "action_approved": "duyệt",
   "action_rejected": "từ chối",
-  "auto_reject_reason": "Booking chưa được duyệt trước ngày khởi hành"
+  "auto_reject_reason": "Booking chưa được duyệt trước ngày khởi hành",
+  "departure_passed": "Đã tới ngày khởi hành, không thể duyệt booking"
 }

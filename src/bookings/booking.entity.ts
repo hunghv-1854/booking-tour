@@ -11,6 +11,7 @@ import {
 import { decimalColumnTransformer } from '../common/transformers/decimal-column.transformer';
 import { Tour } from '../tours/tour.entity';
 import { User } from '../users/user.entity';
+import { BookingPaymentStatus } from './booking-payment-status.enum';
 import { BookingStatus } from './booking-status.enum';
 
 @Entity('bookings')
@@ -56,6 +57,17 @@ export class Booking {
     default: BookingStatus.PENDING,
   })
   status: BookingStatus;
+
+  @Column({
+    name: 'payment_status',
+    type: 'enum',
+    enum: BookingPaymentStatus,
+    default: BookingPaymentStatus.UNPAID,
+  })
+  paymentStatus: BookingPaymentStatus;
+
+  @Column({ name: 'payment_due_at', nullable: true, type: 'timestamptz' })
+  paymentDueAt: Date | null;
 
   @Column({ nullable: true, type: 'text' })
   note: string | null;

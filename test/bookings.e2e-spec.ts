@@ -367,6 +367,10 @@ describe('Bookings (e2e)', () => {
         .expect(200)
         .expect({ id: fixtures.alicePending.id, status: 'approved' });
 
+      const approved = await dataSource
+        .getRepository(Booking)
+        .findOneByOrFail({ id: fixtures.alicePending.id });
+      expect(approved.paymentDueAt!.getTime()).toBeGreaterThan(Date.now());
       expect(await availableSlotOf(fixtures.upcomingTour.id)).toBe(7);
       expect(testApp.notifications.notifyStatusChanged).toHaveBeenCalledWith(
         fixtures.alicePending.id,

@@ -12,12 +12,17 @@ export const BOOKING_NOTIFICATION_JOB_OPTIONS = {
 };
 
 export const DEFAULT_MAIL_LANG = 'vi';
+export const MAIL_DATE_LOCALES: Record<string, string> = {
+  vi: 'vi-VN',
+  en: 'en-GB',
+};
 
 export const BOOKING_NOTIFICATION_SELECT = {
   id: true,
   startDate: true,
   status: true,
   rejectReason: true,
+  paymentDueAt: true,
   user: { id: true, email: true, fullName: true },
   tour: { id: true, name: true },
 } as const;
