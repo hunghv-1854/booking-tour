@@ -6,6 +6,7 @@ import { runScheduledTask } from '../common/scheduling/scheduled-task.util';
 import { APP_TIMEZONE } from '../common/time/time.constants';
 import { BookingNotificationService } from '../notifications/booking-notification.service';
 import { NotificationTemplate } from '../notifications/notification-template.enum';
+import { BookingPaymentStatus } from './booking-payment-status.enum';
 import { BookingStatus } from './booking-status.enum';
 import { Booking } from './booking.entity';
 import { addDays, today } from './booking.util';
@@ -31,6 +32,7 @@ export class BookingReminderTask {
       const bookings = await this.bookingsRepository.find({
         where: {
           status: BookingStatus.APPROVED,
+          paymentStatus: BookingPaymentStatus.PAID,
           startDate: addDays(today(), BOOKING_REMINDER_DAYS_BEFORE),
         },
         select: BOOKING_REMINDER_SELECT,

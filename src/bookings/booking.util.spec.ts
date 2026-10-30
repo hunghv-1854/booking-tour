@@ -1,4 +1,4 @@
-import { addDays, calculateTotalPrice } from './booking.util';
+import { addDays, calculateTotalPrice, paymentDeadline } from './booking.util';
 
 describe('booking.util', () => {
   describe('calculateTotalPrice', () => {
@@ -18,6 +18,22 @@ describe('booking.util', () => {
 
     it('subtracts days with a negative offset', () => {
       expect(addDays('2026-11-10', -2)).toBe('2026-11-08');
+    });
+  });
+
+  describe('paymentDeadline', () => {
+    const now = new Date('2026-10-20T03:00:00Z');
+
+    it('holds the booking for 24 hours when departure is later', () => {
+      expect(paymentDeadline('2026-10-30', now)).toEqual(
+        new Date('2026-10-21T03:00:00Z'),
+      );
+    });
+
+    it('never goes past midnight of the departure day in Vietnam time', () => {
+      expect(paymentDeadline('2026-10-21', now)).toEqual(
+        new Date('2026-10-20T17:00:00Z'),
+      );
     });
   });
 });

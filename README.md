@@ -41,6 +41,7 @@ Mock project thực hành NestJS: xây dựng backend API cho hệ thống đặ
 - [x] Quản lý profile (fullName, phone, upload avatar)
 - [x] Hủy tour khi chưa được admin confirm
 - [x] Đăng nhập qua mạng xã hội (Google)
+- [x] Thanh toán booking đã duyệt qua VNPay (sandbox)
 
 **Admin**
 
@@ -93,6 +94,8 @@ Chạy bằng `@nestjs/schedule`, theo giờ Việt Nam (`Asia/Ho_Chi_Minh`). Em
 | `BookingExpirationTask` | Mỗi giờ | Booking còn `pending` khi đã tới ngày khởi hành → `rejected` (lý do tự động), hoàn slot cho tour, email báo user |
 | `BookingReminderTask` | 08:00 mỗi ngày | Booking `approved` khởi hành ngày mai → email nhắc lịch |
 | `BookingCompletionTask` | 01:00 mỗi ngày | Booking `approved` đã qua ngày kết thúc → `completed`, email mời review |
+| `PaymentExpirationTask` | Mỗi 5 phút | Giao dịch `pending` quá hạn link + 15 phút chờ IPN trễ → `expired` |
+| `BookingPaymentExpirationTask` | Mỗi 15 phút | Booking `approved` chưa thanh toán đã quá `payment_due_at` (không còn giao dịch `pending`) → `cancelled`, hoàn slot, email báo user |
 | `UploadCleanupTask` | 03:00 Chủ nhật | Xoá file trong `public/uploads` cũ hơn 24h mà không còn bản ghi `attachments` |
 
 Các job đều idempotent (chạy lại không đổi kết quả), có unit test (`src/bookings/booking-scheduled-tasks.spec.ts`, `src/attachments/upload-cleanup.task.spec.ts`) và e2e (`test/scheduled-jobs.e2e-spec.ts`). Khi chạy nhiều instance, mỗi instance đều chạy cron → nên chuyển sang BullMQ repeatable job hoặc lock Redis.
@@ -103,7 +106,21 @@ Các job đều idempotent (chạy lại không đổi kết quả), có unit te
 - `BookingExpirationTask` và `BookingCompletionTask` đặt UPDATE và bước đẩy email vào queue trong cùng transaction. Nếu không đẩy được (Redis lỗi) thì rollback, booking giữ nguyên trạng thái và lần chạy sau làm lại, không có booking nào đã đổi trạng thái mà mất email.
 - Gửi email lỗi thì BullMQ retry 3 lần (exponential backoff), job lỗi hẳn được log ở `@OnWorkerEvent('failed')`.
 
-Dự kiến thêm khi có thanh toán: huỷ booking giữ chỗ quá hạn chưa thanh toán (delayed job + cron dự phòng), đối soát giao dịch treo với cổng thanh toán.
+Dự kiến thêm: đối soát giao dịch treo bằng API `querydr` của VNPay thay vì chỉ đánh dấu `expired`.
+
+## Thanh toán (VNPay sandbox)
+
+Luồng: user đặt tour → admin duyệt (`payment_due_at` = min(duyệt + 24h, 00:00 ngày khởi hành)) → user `POST /api/payments { bookingId }` nhận `paymentUrl` → thanh toán trên VNPay → VNPay gọi IPN → booking `payment_status = paid` + email xác nhận. Quá hạn chưa trả thì cron huỷ booking và hoàn slot.
+
+| Endpoint | Mô tả |
+|---|---|
+| `POST /api/payments` | (JWT) tạo link VNPay cho booking của mình, hiệu lực 15 phút (không quá hạn thanh toán). Gọi lại khi link còn hạn thì trả lại đúng giao dịch đó, tránh thanh toán 2 lần |
+| `GET /api/payments/vnpay/ipn` | VNPay gọi server-to-server. Verify chữ ký HMAC-SHA512, khoá dòng `payments` (`FOR UPDATE`), kiểm tra số tiền, chỉ xử lý giao dịch `pending` (IPN gửi lại → `02`). Cập nhật payment + booking + đẩy email trong 1 transaction; lỗi → `99` để VNPay gửi lại |
+| `GET /api/payments/vnpay/return` | Trang VNPay redirect user về. Chỉ verify chữ ký và trả kết quả, **không** đổi trạng thái (trạng thái chỉ tin IPN) |
+
+Cấu hình (`.env`): `VNPAY_TMN_CODE`, `VNPAY_HASH_SECRET` (đăng ký tại https://sandbox.vnpayment.vn/devreg/), `VNPAY_PAYMENT_URL`, `VNPAY_RETURN_URL`. URL IPN cấu hình trên trang merchant của VNPay: `https://<domain>/api/payments/vnpay/ipn`. Thiếu cấu hình thì app vẫn chạy, chỉ API tạo link báo lỗi.
+
+Booking đã `approved`/`completed` trước khi có tính năng thanh toán được migration đánh dấu `paid`.
 
 ## Test
 

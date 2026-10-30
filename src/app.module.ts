@@ -14,6 +14,7 @@ import { BookingsModule } from './bookings/bookings.module';
 import { CategoriesModule } from './categories/categories.module';
 import { DatabaseModule } from './database/database.module';
 import { redisConnectionOptions } from './redis/redis-connection.util';
+import { PaymentsModule } from './payments/payments.module';
 import { RedisModule } from './redis/redis.module';
 import { ReviewsModule } from './reviews/reviews.module';
 import { ToursModule } from './tours/tours.module';
@@ -52,6 +53,7 @@ import { ToursModule } from './tours/tours.module';
     ToursModule,
     BookingsModule,
     ReviewsModule,
+    PaymentsModule,
   ],
 })
 export class AppModule {}

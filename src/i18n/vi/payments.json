@@ -1,0 +1,5 @@
+{
+  "booking_not_payable": "Chỉ booking đã duyệt và chưa thanh toán mới được thanh toán",
+  "payment_deadline_passed": "Đã quá hạn thanh toán booking",
+  "order_info": "Thanh toan booking #{bookingId}"
+}

@@ -7,5 +7,6 @@
   "action_cancelled": "cancelled",
   "action_approved": "approved",
   "action_rejected": "rejected",
-  "auto_reject_reason": "The booking was not approved before the departure date"
+  "auto_reject_reason": "The booking was not approved before the departure date",
+  "departure_passed": "The departure date has been reached, the booking can no longer be approved"
 }

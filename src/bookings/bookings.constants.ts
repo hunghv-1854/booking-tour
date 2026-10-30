@@ -10,6 +10,8 @@ export const BOOKING_SELECT = {
   numberOfChildren: true,
   totalPrice: true,
   status: true,
+  paymentStatus: true,
+  paymentDueAt: true,
   note: true,
   rejectReason: true,
   createdAt: true,
@@ -41,6 +43,7 @@ export const BOOKING_TRANSITION_SELECT = {
   userId: true,
   tourId: true,
   status: true,
+  startDate: true,
   numberOfAdults: true,
   numberOfChildren: true,
 } as const;
@@ -57,6 +60,7 @@ export const BOOKING_LIST_COLUMNS = [
   'booking.numberOfChildren',
   'booking.totalPrice',
   'booking.status',
+  'booking.paymentStatus',
   'booking.createdAt',
   'tour.id',
   'tour.name',
@@ -78,3 +82,4 @@ export const BOOKING_EXPIRATION_CRON = '0 0 * * * *';
 export const BOOKING_REMINDER_CRON = '0 0 8 * * *';
 export const BOOKING_REMINDER_DAYS_BEFORE = 1;
 export const BOOKING_REMINDER_SELECT = { id: true } as const;
+export const BOOKING_PAYMENT_HOLD_MS = 24 * 60 * 60 * 1000;

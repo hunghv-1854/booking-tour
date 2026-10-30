@@ -20,6 +20,7 @@ describe('BookingTransitionService', () => {
     userId: 7,
     tourId: 3,
     status: BookingStatus.PENDING,
+    startDate: '2099-01-10',
     numberOfAdults: 2,
     numberOfChildren: 1,
   };
@@ -77,7 +78,7 @@ describe('BookingTransitionService', () => {
     expect(manager.update).not.toHaveBeenCalled();
   });
 
-  it('approves without releasing slots', async () => {
+  it('approves with a payment deadline and without releasing slots', async () => {
     manager.findOne.mockResolvedValue(pendingBooking);
 
     const result = await service.fromPending(1, BookingStatus.APPROVED);
@@ -85,8 +86,21 @@ describe('BookingTransitionService', () => {
     expect(result).toEqual({ id: 1, status: BookingStatus.APPROVED });
     expect(manager.update).toHaveBeenCalledWith(Booking, 1, {
       status: BookingStatus.APPROVED,
+      paymentDueAt: expect.any(Date) as Date,
     });
     expect(manager.increment).not.toHaveBeenCalled();
+  });
+
+  it('refuses to approve once the departure day has come', async () => {
+    manager.findOne.mockResolvedValue({
+      ...pendingBooking,
+      startDate: '2000-01-01',
+    });
+
+    await expect(
+      service.fromPending(1, BookingStatus.APPROVED),
+    ).rejects.toBeInstanceOf(ConflictException);
+    expect(manager.update).not.toHaveBeenCalled();
   });
 
   it.each([BookingStatus.CANCELLED, BookingStatus.REJECTED])(

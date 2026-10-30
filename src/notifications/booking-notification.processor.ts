@@ -5,10 +5,12 @@ import { Job } from 'bullmq';
 import { I18nService } from 'nestjs-i18n';
 import { Repository } from 'typeorm';
 import { Booking } from '../bookings/booking.entity';
+import { APP_TIMEZONE } from '../common/time/time.constants';
 import { MailService } from '../mail/mail.service';
 import {
   BOOKING_NOTIFICATION_QUEUE,
   BOOKING_NOTIFICATION_SELECT,
+  MAIL_DATE_LOCALES,
 } from './notifications.constants';
 import { BookingNotificationJob } from './notifications.interface';
 
@@ -43,6 +45,12 @@ export class BookingNotificationProcessor extends WorkerHost {
       tourName: booking.tour.name,
       startDate: booking.startDate,
       reason: booking.rejectReason,
+      paymentDueAt: booking.paymentDueAt?.toLocaleString(
+        MAIL_DATE_LOCALES[data.lang],
+        {
+          timeZone: APP_TIMEZONE,
+        },
+      ),
     };
     const t = (key: string) =>
       this.i18n.t(`mail.${data.template}_${key}`, {

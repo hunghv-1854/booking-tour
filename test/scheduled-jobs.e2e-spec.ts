@@ -3,6 +3,7 @@ import { DataSource, Repository } from 'typeorm';
 import { BookingCompletionTask } from '../src/bookings/booking-completion.task';
 import { BookingExpirationTask } from '../src/bookings/booking-expiration.task';
 import { BookingReminderTask } from '../src/bookings/booking-reminder.task';
+import { BookingPaymentStatus } from '../src/bookings/booking-payment-status.enum';
 import { BookingStatus } from '../src/bookings/booking-status.enum';
 import { Booking } from '../src/bookings/booking.entity';
 import { addDays, today } from '../src/bookings/booking.util';
@@ -119,8 +120,13 @@ describe('Scheduled jobs (e2e)', () => {
   });
 
   describe('BookingReminderTask', () => {
-    it('reminds only approved bookings departing tomorrow', async () => {
+    it('reminds only paid approved bookings departing tomorrow', async () => {
       const tomorrow = await seedBooking({
+        status: BookingStatus.APPROVED,
+        paymentStatus: BookingPaymentStatus.PAID,
+        startDate: addDays(today(), 1),
+      });
+      await seedBooking({
         status: BookingStatus.APPROVED,
         startDate: addDays(today(), 1),
       });
@@ -130,6 +136,7 @@ describe('Scheduled jobs (e2e)', () => {
       });
       await seedBooking({
         status: BookingStatus.APPROVED,
+        paymentStatus: BookingPaymentStatus.PAID,
         startDate: addDays(today(), 2),
       });
 

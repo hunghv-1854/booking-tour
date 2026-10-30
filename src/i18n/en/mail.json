@@ -1,6 +1,6 @@
 {
   "booking_approved_subject": "Your booking #{bookingId} has been approved",
-  "booking_approved_body": "Hi {fullName},\n\nYour booking #{bookingId} for \"{tourName}\" starting on {startDate} has been approved. See you soon!\n\nBooking Tour",
+  "booking_approved_body": "Hi {fullName},\n\nYour booking #{bookingId} for \"{tourName}\" departing on {startDate} has been approved. Please pay before {paymentDueAt}, otherwise the booking will be cancelled.\n\nBooking Tour",
   "booking_rejected_subject": "Your booking #{bookingId} has been rejected",
   "booking_rejected_body": "Hi {fullName},\n\nUnfortunately your booking #{bookingId} for \"{tourName}\" starting on {startDate} has been rejected.\nReason: {reason}\n\nBooking Tour",
   "password_reset_subject": "Reset your Booking Tour password",
@@ -10,5 +10,9 @@
   "booking_reminder_subject": "Reminder: \"{tourName}\" departs tomorrow",
   "booking_reminder_body": "Hi {fullName},\n\nYour booking #{bookingId} for \"{tourName}\" departs tomorrow ({startDate}). Please prepare your ID and arrive on time.\n\nBooking Tour",
   "review_invitation_subject": "How was \"{tourName}\"?",
-  "review_invitation_body": "Hi {fullName},\n\nThank you for travelling with us on \"{tourName}\" (booking #{bookingId}). We would love to hear your review of the tour.\n\nBooking Tour"
+  "review_invitation_body": "Hi {fullName},\n\nThank you for travelling with us on \"{tourName}\" (booking #{bookingId}). We would love to hear your review of the tour.\n\nBooking Tour",
+  "payment_succeeded_subject": "Payment for booking #{bookingId} received",
+  "payment_succeeded_body": "Hi {fullName},\n\nWe have received your payment for booking #{bookingId} (\"{tourName}\", departing on {startDate}). See you soon!\n\nBooking Tour",
+  "booking_payment_expired_subject": "Booking #{bookingId} was cancelled for non-payment",
+  "booking_payment_expired_body": "Hi {fullName},\n\nYour booking #{bookingId} for \"{tourName}\" departing on {startDate} was cancelled because it was not paid before {paymentDueAt}.\n\nBooking Tour"
 }

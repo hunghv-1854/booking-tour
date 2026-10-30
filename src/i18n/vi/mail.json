@@ -1,6 +1,6 @@
 {
   "booking_approved_subject": "Booking #{bookingId} của bạn đã được duyệt",
-  "booking_approved_body": "Xin chào {fullName},\n\nBooking #{bookingId} cho tour \"{tourName}\" khởi hành ngày {startDate} đã được duyệt. Hẹn gặp bạn!\n\nBooking Tour",
+  "booking_approved_body": "Xin chào {fullName},\n\nBooking #{bookingId} cho tour \"{tourName}\" khởi hành ngày {startDate} đã được duyệt. Vui lòng thanh toán trước {paymentDueAt}, quá hạn booking sẽ bị huỷ.\n\nBooking Tour",
   "booking_rejected_subject": "Booking #{bookingId} của bạn đã bị từ chối",
   "booking_rejected_body": "Xin chào {fullName},\n\nRất tiếc, booking #{bookingId} cho tour \"{tourName}\" khởi hành ngày {startDate} đã bị từ chối.\nLý do: {reason}\n\nBooking Tour",
   "password_reset_subject": "Đặt lại mật khẩu Booking Tour",
@@ -10,5 +10,9 @@
   "booking_reminder_subject": "Nhắc lịch: tour \"{tourName}\" khởi hành ngày mai",
   "booking_reminder_body": "Xin chào {fullName},\n\nBooking #{bookingId} cho tour \"{tourName}\" sẽ khởi hành vào ngày mai ({startDate}). Bạn nhớ chuẩn bị giấy tờ tuỳ thân và có mặt đúng giờ nhé.\n\nBooking Tour",
   "review_invitation_subject": "Chuyến đi \"{tourName}\" của bạn thế nào?",
-  "review_invitation_body": "Xin chào {fullName},\n\nCảm ơn bạn đã đồng hành cùng chúng tôi trong tour \"{tourName}\" (booking #{bookingId}). Hãy để lại đánh giá để giúp những du khách khác nhé.\n\nBooking Tour"
+  "review_invitation_body": "Xin chào {fullName},\n\nCảm ơn bạn đã đồng hành cùng chúng tôi trong tour \"{tourName}\" (booking #{bookingId}). Hãy để lại đánh giá để giúp những du khách khác nhé.\n\nBooking Tour",
+  "payment_succeeded_subject": "Thanh toán booking #{bookingId} thành công",
+  "payment_succeeded_body": "Xin chào {fullName},\n\nChúng tôi đã nhận thanh toán cho booking #{bookingId} (tour \"{tourName}\", khởi hành ngày {startDate}). Hẹn gặp bạn!\n\nBooking Tour",
+  "booking_payment_expired_subject": "Booking #{bookingId} đã bị huỷ do quá hạn thanh toán",
+  "booking_payment_expired_body": "Xin chào {fullName},\n\nBooking #{bookingId} cho tour \"{tourName}\" khởi hành ngày {startDate} đã bị huỷ vì chưa được thanh toán trước {paymentDueAt}.\n\nBooking Tour"
 }

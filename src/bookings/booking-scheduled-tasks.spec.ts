@@ -7,6 +7,7 @@ import { NotificationTemplate } from '../notifications/notification-template.enu
 import { BookingCompletionTask } from './booking-completion.task';
 import { BookingExpirationTask } from './booking-expiration.task';
 import { BookingReminderTask } from './booking-reminder.task';
+import { BookingPaymentStatus } from './booking-payment-status.enum';
 import { BookingStatus } from './booking-status.enum';
 import { Booking } from './booking.entity';
 
@@ -85,7 +86,11 @@ describe('Booking scheduled tasks', () => {
 
     expect(bookingsRepository.find).toHaveBeenCalledWith(
       expect.objectContaining({
-        where: { status: BookingStatus.APPROVED, startDate: '2026-10-22' },
+        where: {
+          status: BookingStatus.APPROVED,
+          paymentStatus: BookingPaymentStatus.PAID,
+          startDate: '2026-10-22',
+        },
       }),
     );
     expect(notifications.notifyMany).toHaveBeenCalledWith(
