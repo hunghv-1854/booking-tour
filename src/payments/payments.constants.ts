@@ -44,3 +44,10 @@ export const PAYMENT_IPN_SELECT = {
   amount: true,
   status: true,
 } as const;
+
+export const PAYMENT_LINK_SELECT = {
+  id: true,
+  txnRef: true,
+  amount: true,
+  expiresAt: true,
+} as const;

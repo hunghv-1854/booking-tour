@@ -19,6 +19,7 @@ import {
   IPN_RESPONSES,
   PAYMENT_BOOKING_SELECT,
   PAYMENT_IPN_SELECT,
+  PAYMENT_LINK_SELECT,
   PAYMENT_LINK_TTL_MS,
   VNPAY_SUCCESS_CODE,
 } from './payments.constants';
@@ -79,6 +80,7 @@ export class PaymentsService {
           status: PaymentStatus.PENDING,
           expiresAt: MoreThan(now),
         },
+        select: PAYMENT_LINK_SELECT,
       });
       if (pending) return pending;
 
