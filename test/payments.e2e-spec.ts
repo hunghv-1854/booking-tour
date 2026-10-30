@@ -1,4 +1,5 @@
 import { INestApplication } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import request from 'supertest';
 import { DataSource, Repository } from 'typeorm';
 import { BookingPaymentStatus } from '../src/bookings/booking-payment-status.enum';
@@ -23,7 +24,6 @@ import { loginAs } from './helpers/auth';
 import { truncateAllTables } from './helpers/database';
 import { createTestApp, TestApp } from './helpers/test-app';
 
-const HASH_SECRET = 'e2e-vnpay-hash-secret';
 const HOUR = 60 * 60 * 1000;
 
 describe('Payments (e2e)', () => {
@@ -35,6 +35,8 @@ describe('Payments (e2e)', () => {
   let fixtures: BookingFixtures;
   let aliceToken: string;
   let booking: Booking;
+  let hashSecret: string;
+  let tmnCode: string;
 
   const createPayment = (bookingId: number, token = aliceToken) =>
     request(app.getHttpServer())
@@ -43,7 +45,7 @@ describe('Payments (e2e)', () => {
       .send({ bookingId });
   const signedQuery = (params: Record<string, string>) => ({
     ...params,
-    vnp_SecureHash: signVnpayParams(params, HASH_SECRET),
+    vnp_SecureHash: signVnpayParams(params, hashSecret),
   });
   const ipnQuery = (payment: Payment, overrides = {}) =>
     signedQuery({
@@ -87,6 +89,9 @@ describe('Payments (e2e)', () => {
     dataSource = testApp.dataSource;
     bookings = dataSource.getRepository(Booking);
     payments = dataSource.getRepository(Payment);
+    const config = app.get(ConfigService);
+    hashSecret = config.getOrThrow<string>('VNPAY_HASH_SECRET');
+    tmnCode = config.getOrThrow<string>('VNPAY_TMN_CODE');
   });
 
   beforeEach(async () => {
@@ -123,11 +128,11 @@ describe('Payments (e2e)', () => {
         'https://sandbox.vnpayment.vn/paymentv2/vpcpay.html',
       );
       expect(query).toMatchObject({
-        vnp_TmnCode: 'E2ETEST1',
+        vnp_TmnCode: tmnCode,
         vnp_TxnRef: body.txnRef,
         vnp_Amount: '200000000',
       });
-      expect(verifyVnpaySignature(query, HASH_SECRET)).toBe(true);
+      expect(verifyVnpaySignature(query, hashSecret)).toBe(true);
 
       const second = await createPayment(booking.id).expect(201);
       expect((second.body as { txnRef: string }).txnRef).toBe(body.txnRef);
